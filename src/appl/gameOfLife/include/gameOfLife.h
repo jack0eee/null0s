@@ -1,0 +1,4 @@
+
+void gamelife ( void ) ;
+
+/* EOF */

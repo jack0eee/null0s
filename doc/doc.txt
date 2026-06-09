@@ -1,0 +1,68 @@
+================================
+Generazione e BOOT ISO
+==========================
+riferimenti sulla rete : OSDev wiki
+che consiglia la cross toolchain GNU
+* i686-elf-gcc
+* i686-elf-binutils
+- - - - - - - - - - - - - - - - - - - - 
+
+
+Creare ISO bootabile
+
+iso/
+|
++--- boot/
+      |
+      +--- null0s.bin
+      +--- grub/
+            |
+            +--- grub.cfg
+
+
+-------------
+
+mkdir iso/boot/grub
+
+cp null0s.bin iso/boot/
+
+-------------
+
+grub.cfg
+
+menuentry "null0s" {
+     multiboot /boot/null0s.bin
+     boot
+}
+
+---------------------------------------------------------------
+
+generazione ISO
+
+grub-mkrescue -o null0s.iso iso
+
+--------------------------------------------------------------
+
+verifica di avvio con grub
+
+grub-file --is-x86-multiboot null0s.bin
+echo $?
+
+se stampa 0 e' bootabile
+
+--------------------------------------------------------------
+
+avvio con QEMU
+
+qemu-system-x86-64 -cdrom null0s.iso
+
+oppure
+
+qemu-system-i386 -kernel null0s.bin
+
+
+vedrai 
+
+null0s
+
+

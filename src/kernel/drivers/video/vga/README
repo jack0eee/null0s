@@ -1,0 +1,74 @@
+
+Interfaccia VGA (PMIO | Port Mapped I/O)
+
+CPU invia messaggio fuori diretto al una certa porta specificata nell'istruzione assembler out
+e non sa piu' nulla. Questo messaggio arriva sul bus ed in qualche modo viene intercettato
+dalla periferica a cui e' diretto, questa capisce che e' suo e se lo prende.
+
+Il messaggio puo' avere 2 significati :
+
+   1) [Select Register] Seleziona il registro XX
+   2) [Setting Register Selected] Imposta il registro selezionato con questo valore.
+    
+Ogni device ha piu' PORTE di riferimento. Che si tratti di [Select Register] o di
+un [Setting Register] quetso dipende dalla PORTA UTILIZZATA.
+ 
+Per la gestione del Cursore, VGA fornisce le 2 Porte : 0x3D4 e 0x3D5, la prima
+per selezionare il registro e la seconda per impostare quetso con un certo valore.
+
+L'accoppiata PORTA e REGISTRO identifica la specifica funzionalita'
+
+0x3D4 0x0A    Seleziona il registro 0x0A
+0x3D5 0       Imposta il registro Selezionato a 0
+
+0x3D4 0x0B    Seleziona il registro 0x0B
+0x3D5 15      Imposta il registro Selezionato a 15   
+ 
+Per cui e' come se fosse :
+
+0x0A <- 0
+0x0B <- 15
+
+In tal caso VGA traduce questo con il comando di disegnare un CURSORE LAMPEGGIANTE a VIDEO
+ad una certa posizione che ricavera' in altro modo.
+
+Quindi la PORTA serve per far si che il Device capisca che si tratta di un messaggio
+a lui indizzato o meno, pero' sicuramente identifica con l'accoppiata del registro
+selezionato anche una la funzionalita' richiesta ed il contenuto del registro anche 
+il parametro. In caso di funzionalita' che richiedono piu' di un parametro son necessari
+piu' di un messaggio (anzi piu' di una coppia di messaggi: uno per selezione del registro 
+e una per il valore con cui deve valorizzato quel registro ).
+
+---------
+
+
+PORT API Organizzate per Categoria Principali (o blocchi principali) :
+
+BLOCCO : CRTC (Cathode Ray Tube Controller) : Timing e Cursore
+
+>> Timing ???
+
+>> Cursore (80x25 Colore)
+
+   Le Porte sono :
+   - 0x3D4 | CRTC Index Register   (Porta Selezione Registro)
+   - 0x3D5 | CRTC Data Register    (Porta Valorizzazione Registro Selezionato)
+
+   I Registri sono :
+   - 0x0A  | Cursor Location HIGH  (Registro del Valore Alto  dell'Offset in cui posizionare il Cursore)
+   - 0x0B  | Cursor Location LOW   (Registro per Valore Basso dell'Offset in cui posizionare il Cursore)
+
+>> Cursore (80x25 Monocromatico)
+
+   Le porte sono : 0x3B4/0x3B5
+
+
+BLOCCO Sequencer : Clock e gestione della memoria video [0x3C4, 0x3C5]
+BLOCCO Graphics Controller : Modalita' grafiche, bit planei [0x3CE, 0x3CF]
+BLOCCO Attribute Controller : Colori, Palette e Modalita' testo [0x3C0, 0x3C1]
+BLOCCO DAC (Palette 256 colori) [0x3C6, 0x3C7, 0x3C8, 0x3C9]
+BLOCCO Misc / STatus [0x3C2, 0x3CC, 0x3CA, 0x3DA]
+
+#===----
+
+
