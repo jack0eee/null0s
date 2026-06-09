@@ -1,8 +1,9 @@
-/* sintassi Intel / NASM 
+;
+;  boot.s ( sintassi Intel / NASM )
+;
+;
+; 
 
-/* boot.s */
-
-#Per assemblare nel formato intel con GAS, GCC e clang
 .intel_syntax noprefix
 
 .set ALIGN,    1<<0
