@@ -1,0 +1,278 @@
+
+  Definizione dei tipi dati base.
+
+  Per supportare piu' architetture (8, 16, 32 e 64bit) e mantenere null0s  
+  come progetto a scopo autoformativo e didattico, ho scelto di creare al di sotto 
+  della src/libc/include l'ulteriore livello arch/, quindi una versione degli header
+  per ogni architettura supportata, o in via di supporto.
+  Degli header comuni a tutte le architetture mantenere un'unica versione 
+  in src/libc/include.
+  ---
+  La fase di build (in fase di configure), dovra' sapere l'architettura 
+  che si intendera' utilizzare, per spostare in src/libc/include  
+  gli header specifici da src/libc/incude/arch/<architettura>/ 
+
+  esempio.
+
+  Il comando :
+
+  ./configure --arch i386 --prefix ...
+
+  produrra' la seguente copia :
+
+  cp src/libc/include/arch/i386/* /src/libc/include/
+
+
+  Architetture Supportate.
+  ==================================================================================
+  arch       CPU         
+  ==================================================================================
+  z80        zilog z80     
+  i86        intel 8086/8088/80186/80286   
+  i386       intel 80386/80486/Pentium/PentiumPro/PentiumII/PentiumIII     
+  x86_64     intel64|amd64 
+  ----------------------------------------------------------------------------------
+
+
+  Modelli CPU per ogni Architettura.
+  ===========================================================================================
+  arch       CPU           registri   bus indirizzi    char  short  int  long  void* longlong 
+  =========================================================================================== 
+  z80        z80           8          16 (64k)         1     2      2    4(*)  2 
+  -------------------------------------------------------------------------------------------
+  i86        8086          16         20 (1Mb)         1     2      2    4(*)  2
+  i86        8088          16         20 (1Mb)         1     2      2    4(*)  2
+  i86        80186         16         20 (1Mb)         1     2      2    4(*)  2
+  i86        80286         16         24 (16Mb)(**)    1     2      2    4(*)  2
+  -------------------------------------------------------------------------------------------
+  i386       80386         32         32               1     2      4    4     4     8
+  i386       80486         32         32               1     2      4    4     4     8
+  i386       Pentium       32         32               1     2      4    4     4     8
+  i386       PentiumPro    32         32               1     2      4    4     4     8
+  i386       PentiunII     32         32               1     2      4    4     4     8
+  i386       PentiumIII    32         32               1     2      4    4     4     8
+  -------------------------------------------------------------------------------------------
+  x86_64                   64         64               1     2      4    4     8     8 
+  -------------------------------------------------------------------------------------------
+
+  (*) software emulation, costoso
+  (**) protect memory mode 
+
+
+
+  ==============================================================================
+  Premessa.
+  ==========================================================
+
+  Se stai scivendo una libc portatile per macchine a
+  8, 16, 32 e 64 bit, conviene che ti attieni
+  allo standard :
+
+  stdint.h
+  stddef.h
+  inittype.h
+
+  e definire i tipi in termini di :
+  larghezza garantita oppure capacita' minima :
+
+
+  ==================================================
+  Tipi interi a lunghezza esatta
+  ==================================================
+
+  Da definire quando l'architettura li supporta :
+
+  Attenzione lo standard richiede che esistano solo le la macchina
+  possiede effettivamente un tipo con quella larghezza esatta,
+  ad esempio su una CPU ad 8 bit potrebbe anche non esistere
+  l'int64_t
+ 
+  ---------------------------------------------------------------
+  definizione tipo                       z80  8086 80386 amd64 
+  ---------------------------------------------------------------
+  typedef signed char         int8_t     Si   Si   Si    Si
+  typedef unsigned char       uint8_t    Si   Si   Si    Si
+
+  typedef signed short int    int16_t    Si   Si   Si    Si
+  typedef unsigned short int  uint16_t   Si   Si   Si    Si
+
+  typedef signed int          int32_t    ??   Si   Si    Si
+  typedef unsigned int        uint32_t   ??   Si   Si    Si
+
+  typedef signed long long    int64_t    ??   ??   Si    Si
+  typedef unsigned long long  uint64_t   ??   ??   Si    Si
+  ---------------------------------------------------------------
+
+
+  ==================================================
+  Tipi "almeno N bit" 
+  ==================================================
+
+  Questi sono sempre utili :
+
+  -----------------------------------------------
+  definizione tipo            tipo 
+  -----------------------------------------------
+  typedef signed char         int_least8_t     
+  typedef unsigned char       uint_least8_t    
+
+  typedef signed short int    int_least16_t    
+  typedef unsigned short int  uint_least16_t   
+
+  typedef signed long         int_least32_t    
+  typedef unsigned long       uint_least32_t   
+
+  typedef signed long long    int_least64_t    
+  typedef unsigned long long  uint_least64_t   
+  -----------------------------------------------
+
+  garantiscono almeno il numero di bit indicato  
+
+
+  ==================================================
+  Tipi "piu' veloci" : dipendono dalla CPU
+  ==================================================
+
+  Su una CPU a 8 bit :
+
+  typedef uint8_t uint_fast8_t ;
+  typedef uint8_t uint_fast16_t ;
+  typedef uint8_t uint_fast32_t ;
+
+
+  ==================================================
+  TIPI LEGATI AI PUNTATORI
+  ==================================================
+
+  size_t : capacita' di indirizzamento (ad esempio risultato della sizeof)
+ 
+  typedef __SIZE_TYPE__ size_t ;
+
+  CPU               size_t
+  -------------------------------
+  8                 uint16_t 
+  16                uint16_t
+  32                uint32_t
+  64                uint64_t 
+
+  =================================================
+
+  ptrdiff_t : differenza tra 2 puntatori
+
+  typedef __PTRDIFF__   ptrdiff_t ;
+
+  CPU               ptrdiff_t
+  -------------------------------
+  8                 int16_t
+  16                int16_t
+  32                int32_t
+  64                int64_t
+
+  =================================================
+
+  intptr_t ed uintptr_t : capaci di contenere un puntatore convertito
+  in un intero
+
+  typedef signed ...       intptr_t
+  typedef unsigned ...     uintptr_t
+
+  tipicamente :
+
+  CPU               ptrdiff_t
+  -------------------------------
+  8                 uint16_t
+  16                uint16_t
+  32                uint32_t
+  64                uint64_t 
+
+
+  =================================================
+
+  Tipi Massimi.
+
+  typedef int64_t      intmax_t ;
+  typedef uint64_t     uintmax_t ;
+
+  =================================================
+
+  Tipi classici del linguaggio.
+
+  Normalmente conviene mantenerli e lasciare
+  che siano definiti dall'ABI della piattaforma
+
+  char        
+  signed char
+  unsigned char
+
+  short
+  unsigned short
+
+  int
+  unsigned int
+
+  long 
+  unsigned long
+
+  long long
+  unsigned long long
+
+  ==================================================
+
+  Macchine ad 8 bit
+
+  Molti programmatori moderni assumono :
+
+  CHAR_BIT == 8
+  sizeof(short) >= 2
+  sizeof(int)   >= 2
+  sizeof(long)  >= 4
+
+  ma una libc davvero portatile dovrebbe usare:
+
+  #include <limits.h>
+
+  e definire all'interno :
+
+  #define CHAR_BIT    ...
+  #define SCHAR_MIN   ...
+  #define INT_MAX     ...
+
+  in funzione dell'architettura,
+  quindi prevedere un albero arch
+  e nella compilazione portarsi 
+  dentro i file per la specificha architettura
+
+  =====================================================
+
+  Approccio usato dalle libc reali 
+
+
+  Le moderne libc (glibc, musl, newlib, picolib) non scrivono
+  direttamente :
+
+  typedef unsigned long uint32_t
+
+  ma, hanno un file di configurazione per ogni target
+  che definisce primitive come :
+
+  __INT8_TYPE__
+  __UINT8_TYPE__
+
+  __INT16_TYPE__
+  __UINT16_TYPE__
+
+  __INT32_TYPE__
+  __UINT32_TYPE__
+
+  __INT64_TYPE__
+  __UINT64_TYPE__
+
+  __SIZE_TYPE__
+  __PTRDIFF_TYPE__
+
+  e poi costruiscono tutti gi header standard sopra
+  queste definizioni.
+
+  Creano un piccolo layer ABI per ogni architettura supportata, e
+  generare automaticamente stdint.h, stddef.h ed inttypes.h da quello,
+  per evitare di riscrivere tutti i typedef per ogni CPU a 8, 16, 32 3 64bit.

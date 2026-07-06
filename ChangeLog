@@ -1,0 +1,58 @@
+Changelog 
+
+
+
+versione 0.1  
+
+* Avvio del kernel (OpeniBSD/qemu)
+* driver (parziale vga testo 80x25).
+
+-----------------------
+
+versione 0.2
+
+>> libc interna :
+
+   * miglioramenti per la portatilita' del codice 
+     Creazione albero delle architetture sotto
+     src/libc/include. Guarda src/libc/include/README.typedef 
+
+   * completamento della string.h, che adesso include le
+     seguenti funzioni ANSI di C99: 
+
+
+>> kernel 
+
+   Nessuna modifica funzionale.  
+
+
+>> kernel/drivers
+
+   vga (text 80x25) correzione bug. 
+
+
+>> fake Application :
+   Le fakeApplication sono incluse nel kernel come funzioni da eseguire
+   di software ANSI (C99) che usano esclusivamente le funzioni 
+   gia' implementate dalla libC, e che usano solo i dispositivi
+   periferici supportati, di cui e' stata scritto il driver.
+   Serve a verificare la bonta dell'implementazione dell'attuale
+   libc e drivers. Quindi vengono utilizzate solo per effettuare
+   un TEST dell'attuale versione.
+
+   * +++live.c (ossia una versione C ANSI e compatibile con 
+               null0s 0.1 e 0.2 di "The Game Of Live" di 
+               Salvatore Sanfilippo (antirez). In realta'  
+               per renderla compatibile ho dovuto sostituire
+               il clear-screen implementato originariamente
+               con sequenza terminati VT100 e la funzione 
+               di sleep non ancora implementata, temporaneamente
+               con una versione con conforme (ciclo a vuoto).
+
+
+happy hacking.   
+
+
+
+//// =====----- EOF
+

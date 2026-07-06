@@ -1,0 +1,92 @@
+Interfaccia grafica VGA 
+
+VGA ha un suo buffer di memoria di 32k, che va dall'indirizzo 0xB8000 all'indirizzo 0xBFFFF. Tale area che il device ci mette a disposizione corrisponde (o comunque strettamente correlata) a cio' che appare sul schermo. VGA permette sia la modalita' testuale (carattere) che la modalita' grafica (pixel). In questo primo appunto trattero' la sola modalita' testuale 80x25, che rappresenta anche il settaggio applicato di defaul dal dispositivo.
+
+
+---
+Dov'e fisicamente il buffer VGA?
+
+I 32k di memoria (0xB8000-0xBFFFF) dove fisicamente si trovino, noi questo non lo sappiamo con certezza, se rimappati in memoria condivisa o su memoria dedicata. Nel desktop di qualche anno fa era necessario inserire nello slot PCI della scheda madre, una scheda controller VGA, e li lo spazio di memoria VGA era nel dispositoivo periferico che andavamo ad aggiungere, che faceva da interfaccia tra scheda madre e Monitor con interfaccia e supporto VGA. Invece nei computer moderni, come il mio "Lenovo Thinkpad i5" (ma vale anche per i desktop), VGA continua ad essere supporta ma *non* esiste viene piu' previsto un controllo hardware dedicato. Il range di memoria VGA viene probabilmente rimappato in memoria condivisa, o altrove. Non ci e' dato di saperlo, se non effettuando uno scanning della PCI per individuare la GPU utilizzata e leggerne la specifica.                              
+----
+
+
+Modalita' Testuale 80x25 (default)
+
+In tale modalita' ogni elemento di questa matrice occupa 2 byte, di cui, nella prima posizione vi e' carattere e nella seconda il suo attributo colore. Quindi possiamo rappresentare un massimo di 256 caratteri (0-255). Nel relativo byte attributo, la parte alta e'per il colore del background e la parte bassa per il colore del carattere (foreground), per un massimo di 16 colori (0-15), sia per l'uno che per l'altro.         
+In questa modalita' viene occupato solamente una minima parte del dell'area VGA resa diponibile, ossia quasi 4k, e per l'esattezza 4000 byte (80*25*2), nel range di indizzi che va da 0xB8000 a 0xBBFFF.  
+
+          char-1            0xB8000     X   
+          char-1-attr       0xB8001     |  Posizioni
+          char-2            0xB8002     |  80x25=2000  
+          char-2-attr       0xB8003     |
+          char-3            0xB8004     |  Posizione =
+          char-3-attr       0xB8005     |  Carattere +
+          ...                           .  Attributo 
+          char-N            0xBBFFE     |  (2 Byte)
+          char-N-attr       0xBBFFF     X
+
+
+Caratteri 
+
+I 256 caratteri previsti da VGA sono memorizzati in memoria, quindi si possono modificare, se si hanno le conoscenze ed i permessi di accesso a questo range. 
+L'astrazione (o il controller hardware) VGA ci imposta di default, in questa area un set di caratteri completo, e quindi nella stragrande maggioranza dei casi d'uso, non dovremmo preoccuparci di nulla a tal riguardo. In futuro, mi potrebbe 'girare' di approfondire, ma per il momento non accorre scendere nel controllo piu' spinto.  
+
+ 
+Attributo colore 
+
+L'attributo viene utilizzato per impostare del carattere, i colori di background e foreground, rispettivamente nel semi-byte alto e nel semi-byte basso. Di seguito la tabella dei 16 colori :  
+
+  -------+--------+---------------------------------
+  Codice | Codice | Alias           | Descrizione
+  -------+--------+---------------------------------
+       0 |      0 | BLACK           | nero
+       1 |      1 | BLUE            | blu
+       2 |      2 | GREEN           | verde
+       3 |      3 | CYAN            | celeste [?] 
+       4 |      4 | RED             | rosso
+       5 |      5 | MAGENDA         | magenda [?]
+       6 |      6 | BROWN           | marrone / giallo scuro
+       7 |      7 | GREY_LIGHT      | grigio chiaro 
+         |        |
+       8 |      8 | GREY_DARK       | grigio scuro
+       9 |      9 | BLUE_LIGHT      | blu chiaro
+      10 |      A | GREEN_LIGHT     | verde chiaro
+      11 |      B | CYAN_LIGHT      | ciano chiaro
+      12 |      C | RED_LIGHT       | rosso chiaro
+      13 |      D | MAGENDA_LIGHT   | magenda
+      14 |      E | YELLOW          | giallo
+      15 |      F | WHITE           | bianco brillante (o blinking BG)         
+  -------+--------+-----------------+--------------- 
+
+
+Domanda : Come scrivere una lettera 'A' (bianca su sfondo nero) alle coordinate video 5x5?
+
+Sappiamo che il buffer VGA inizia all'indirizzo 0xB8000, quindi prima di tutto dobbiamo dichiarare un puntatore a quell'indirizzo, che chiamo "video", in linguaggio C la si puo dichiarare in questo modo :
+
+volatile char *video = (volatile char*) 0xB8000;
+
+Questa locazione di memoria rappresenta il primo carattere della prima riga del video, ossia quello con coordinata 0,0. Per individuare la posizione nel buffer VGA corrispondente alla coordinata video 5x5 e' necessario calcolare l'Offset, ossia la distanza tra l'origine e la nostra destinazione.
+
+#define VGA_DIM_X   80
+#define VGA_DIM_Y   25
+
+unsigned short int offset ; 
+
+offset = (y * VGA_DIM_X + x ) * 2
+
+Nel nostro caso, l'offset vale :
+
+offset = (5*80+5)*2 = 504*2 = 810 
+
+La coordinata video x=5,y=5 nella modalita' 80x25, con origine in 0,0, corrisponde alla posizione 504. Ogni posizione occupa 2 byte, quindi per calcolare l'Offset necessario moltiplicare il numero della posizione per la sua dimensione (504*2), ottenendo 810.
+
+Individuato l'Offset, il resto e' semplicemente :    
+
+video[Offset] = 'A' ;
+video[Offset+1] = BLACK | WHITE ;
+
+Questo e' tutto cio' che bisogna sapere, per iniziare ad utilizzare direttamente VGA.
+
+
+
+ 

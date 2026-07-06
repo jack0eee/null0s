@@ -1,0 +1,43 @@
+TODO 
+
+Questo file contiene cio' che avrei intenzione
+ di aggiungere nei prossimi commit, se ci riesco.
+
+* predisporre il codice per essere maggiormente   
+  portabile ad altre architetture (uso di tipi astratti:
+  uint8, uint16, uint32, uint64, size_t, ... 
+
+* avvio del kernel tramite bootloader. (limane o grub)
+
+* completare il driver vga (80x25).
+
+* rendere disponibile il build per GNU/Linux, con toolchain
+  gnu (gcc, as, ld ...)
+  
+* supporto base per una tastiera PS/2.   
+Anche se questo tipo di dispositivo non sembra piu' 
+essere supportato sugli hardware moderni, ma esclusivamente
+in emulazione, continuando ad utilizzare una normale e
+moderna tastiera USB, quetso mi permette intanto di avere 
+un dispositivo di ingresso, che potrebbe servirmi 
+per implementare e provare altre API della libc interna,
+come ad esempio getchar() o getstring().
+Inoltre mi permette di approfondire l'argomento pmio
+(port mapped I/O) che sto apprendendo in quetso periodo, 
+cosi come "le code circolari".  
+
+* scrivere una documentazione degna di quetso nome, 
+per cio' che e' stato fatto fino a questo momento. 
+Per documentazione intendo dire, qualche documento di 
+dettaglio sui driver vga (incompleto) e ps/2 (incompreto),
+sul meccanismo PMIO, e della differenza con MMIO.
+Inoltre commentare per bene i sorgenti.
+Voglio che quetso sistema rimanga didattico, per chi 
+e' curioso di capire cosa sono i sistemi operativi, e 
+come puo' chiunque avvicinarsi a questo mondo, anche solo
+per darci uno sguardo, come sto facendo io.
+
+
+====---- EOF
+
+ 

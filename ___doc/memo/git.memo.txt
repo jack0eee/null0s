@@ -1,0 +1,13 @@
+
+// modifiche fatte.
+git status
+
+// salvare le modifiche fatte
+git add .
+git commit -m "aggiornamento della giornata..."
+git push
+
+// per vedere cosa cambia
+git diff
+
+

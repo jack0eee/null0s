@@ -1,0 +1,46 @@
+Install 
+
+Al momento non esiste una procedura seria di build dai sorgenti come
+quella implementata per il progetto GNU, che ti permette con dei
+magichi : ./configure, make e make install di ottenere tutto,
+con i parametri di default. In futuro, ci provero' a farla
+(o se qualcuno si diverte con me, facciamo anche prima).
+
+Al momento devi accontentarti dello script che trovi sotto
+la directory build/bin/build.OpenBSD.sh, prossimamente 
+ne preparero una versione per sistemi GNU/Linux 
+Comunque non ci son grosse differenze, se non quella 
+di cambiare compilatore, gnu gcc anziche' clang, che si traduce
+nell'impostare correttamente la variabile CC (CC=gcc)
+e poi in fase di link usare as (delle binutils anziche' come
+faccio io, utilizzando anche per quello clang.
+Il resto dovrebbe essere uguale. 
+
+----
+
+Quindi se vuoi provare subito e senza sforzi devi avere OpenBSD
+ed eseguire lo script di build. Per avviare il nullOs, lo si puo'
+fare con un secondo script che non fa nulla altro che 
+eseguire qemu fornendo il kernel nei parametri (null0s.bin) 
+
+Ricapitolando : 
+
+
+>> Per la build completa eseguire :
+
+tar xfvz null0s-${version}.tar.gz
+cd null0s
+./build/bin/build.OpenBSD.sh
+
+
+>> Per effettuare il boot da qemu :
+
+./build/bin/boot-qemu.sh
+
+
+buon divertimento!
+
+
+====---- EOF
+
+ 

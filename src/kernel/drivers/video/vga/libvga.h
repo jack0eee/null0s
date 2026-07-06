@@ -113,7 +113,7 @@ typedef struct {
 /* 
 Funzione che trasforma un Offset VGA nelle corrispondenti
 coordinate video (80x25). Ritorna la struttura tcoordinate */
-tcoordinate vga_offset2coordinate ( int coordinate ) ;
+tcoordinate vga_offset2coordinate ( unsigned short int offset ) ;
 
 /*
 Struttura di ritorno della funzione vga_attribute2color */
@@ -203,6 +203,9 @@ video, quindi la stampa di un carattere o il setteggio del colore
 (background/foreground). Anche la funzionalita' di scrolling 
 al momento rientra in questa categoria anche se non e' 
 collegata alla singola cella. */   
+
+/* solo test non va bne */
+void vga_buffer_init();
 
 /*
 Legge per una cella video i colori di background e foreground

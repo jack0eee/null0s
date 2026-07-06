@@ -24,6 +24,7 @@
 |  vga_color2attribute(background,foreground)                         |
 |                                                                     |
 |  BUFFER HARDWARE/VIRTALIZZATO (offset e attributi)                  |
+|  vga_buffer_initialize()                           vga | console    |
 |  vga_putchar(c)                                    vga | console    |
 | *vga_getchar()                                     vga | console    |
 |  vga_video_scroll()                                vga              |
@@ -50,7 +51,8 @@ void vga_console_init() {
      console.y = 0 ;
      console.buffer = 0 ;
      console.font_color_background =  0 ; 
-     console.font_color_foreground = 15 ; 
+     console.font_color_foreground = 15 ;
+  // console.char_initialize ; 
 }
 
 /*
@@ -70,7 +72,7 @@ int vga_coordinate2offset ( int x, int y )
 | considerando come numero di colonne 80        |
 | e senza numero massimo di righe               |
 '-----------------------------------------------'*/ 
-tcoordinate vga_offset2coordinate ( int offset )
+tcoordinate vga_offset2coordinate ( unsigned short int offset )
 {
      tcoordinate coordinate ;
 
@@ -180,6 +182,39 @@ unsigned char vga_color2attribute(unsigned char font_color_background, unsigned 
      return font_color_background << 4 | font_color_foreground ;
 }
 
+
+/*
+.-----------------------------------------------.
+| vga_buffer_init() | inizializzazione del      |
+| buffer VGA da console.buffer.                 |
+| Non va bene! Solo test... perche' la console  |
+| se usa buffer non puo essere solamente di     |
+| inizializzazione, non ha senso.. a questo     |
+| conviene il carattere di inizializzazione     |
+| anzichè un intero buffer con caratteri |
+| tutti uguali.                                 |
+'-----------------------------------------------' */
+void vga_buffer_init() 
+{
+     volatile char *video =(volatile char*) 0xB8000;
+     
+     /*
+      * Inizializza il buffer VGA (di dimensioni
+      * DIM_VGA_X*DIM_VGA_Y) di un carattere editabile,
+      * come ad esempio un BLANK. Quest'operazione e'
+      * necessaria se si e' ad esempio in una modalita'
+      * testuale, in cui e' possibile utilizzare il cursore
+      * hardware, perche' questo non appare ad una specifica
+      * posizione, se e' presente ad esempio un null o
+      * altro carattere non editabile, e tu impazzisci
+      * a capire perche' :X   */
+     for ( unsigned short int offset=0; offset<=VGA_DIM_X*VGA_DIM_Y*2; offset=offset+2 ) {
+          video[offset]     = ' ' ;
+          video[offset + 1] = vga_color2attribute(console.font_color_background, console.font_color_foreground) ;
+     }         
+}
+
+
 /*
 .-----------------------------------------------.
 | vga_putchar | scrive un carattere nell'area   |
@@ -190,7 +225,7 @@ int vga_putchar(int c)
 {
      volatile char *video = (volatile char*) 0xB8000;
 
-     int offset ;
+     unsigned short int offset ;
 
      /* Va a capo per Carriage Return */
      if (c == '\n') {
@@ -241,10 +276,10 @@ void vga_video_scroll()
      volatile char *video = (volatile char *)0xB8000;
 
      /* Determina il primo byte della seconda riga (lunghezza riga) */
-     unsigned int offset = VGA_DIM_X * 2 ;
+     unsigned short int offset = VGA_DIM_X * 2 ;
 
      /* Determina l'ultimo byte del buffer */
-     unsigned int offset_fin = VGA_DIM_X*2 * VGA_DIM_Y ;     
+     unsigned short int offset_fin = VGA_DIM_X*2 * VGA_DIM_Y ;     
 
      /* dalla seconda riga - sposta ogni byte nella medesima 
         posizione, ma alla riga precedente */ 
@@ -302,7 +337,7 @@ tcolor vga_font_getcolor (int x, int y)
 
      tcolor color ;
 
-     int offset = vga_coordinate2offset ( x, y ) ; 
+     unsigned short int offset = vga_coordinate2offset ( x, y ) ; 
 
      /*
      spacchetta l'attributo nei due colori, per 
@@ -318,7 +353,7 @@ void vga_font_setcolor ( unsigned char font_color_background, unsigned char font
 {
      volatile char *video = (volatile char *)0xB8000;
 
-     int offset = vga_coordinate2offset ( x, y ) ;
+     unsigned short int offset = vga_coordinate2offset ( x, y ) ;
 
      video[offset+1] = font_color_background << 4 | font_color_foreground ;
 }
@@ -417,22 +452,42 @@ void vga_cursor_disable ()
 '--------------------------------------------' */
 void vga_cursor_setposition (int x, int y)
 {
-    unsigned short int offset = vga_coordinate2offset ( x, y ) ;
-
-    ///////Registri :
-    #define VGA_INDEX 0x3D4
-    #define VGA_DATA  0x3D5
+//  unsigned short int offset = vga_coordinate2offset ( x, y ) / 2 ;
+    unsigned short int offset = ((y)*VGA_DIM_X)+x ;
+ 
+    //////Registri :
+    //#define VGA_INDEX 0x3D4
+    //#define VGA_DATA  0x3D5
 
     device_t *vga_dev ;
 
     vga_dev->type = DEV_PMIO ;
     vga_dev->port_base = 0;
 
+//  coordinate : (x=60, y=2) -> offset = (y*VGA_DIM_X+x)*2 = (2*80+60)*2 = (160+60)*2 = 220*2 = 440 
+//  offset: 440 = 256 + 128 + 32 + 16 + 8 
+
+//  HIGHT
+//  00000001 10110000 | 440
+//  00000000 00000001 | 440 >> 8
+//           00000001 | (unsigned char) 
+//           0x01     | hex          
+
+//  LOW
+//  00000001 10111000 | 440 
+//  00000000 11111111 | 0xFF   
+//  -----------------  
+//  00000000 10111000 | 440 & 0xFF 
+//           10111000 | (unsigned char) 
+//           0xB8     | hex
+
+// 00000011 00101010 = 512 + 256 + 32 + 8 + 2      810   810
+
     device_write ( vga_dev, 0x3D4, 0x0E ) ;
-    device_write ( vga_dev, 0x3D5, (unsigned char)offset >> 8 ) ;
+    device_write ( vga_dev, 0x3D5, (unsigned char)(offset >> 8) ) ;
 
     device_write ( vga_dev, 0x3D4, 0x0F ) ;
-    device_write ( vga_dev, 0x3D5, (unsigned char)offset & 0xFF ) ;
+    device_write ( vga_dev, 0x3D5, (unsigned char)(offset & 0xFF) );  
 }
 
 

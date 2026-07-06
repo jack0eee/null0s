@@ -1,8 +1,10 @@
+/*
 ;
 ;  boot.s ( sintassi Intel / NASM )
 ;
 ;
 ; 
+*/
 
 .intel_syntax noprefix
 

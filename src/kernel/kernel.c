@@ -8,38 +8,43 @@
 '-----------------------------------------------------' */
 
 #include "stdio.h"
+#include "gameOfLife.h"
 
 void kmain(void)
 {
-     char *banner = "null0s 0.1 starting...\n\0" ;
+     char *banner = "null0s 0.1 starting...\n" ;
 
      /*
      .----------------------------------------.
      | Inizializzazione struttura Console VGA |
      '----------------------------------------' */
      vga_console_init();
+     vga_buffer_init();
 
      /*
      .------------------------------------------.
      |              Banner null0s               |
      '------------------------------------------' */
-     putchar('\n');
-     putchar('\n');
+     vga_console_setposition (0,0);
+
      vga_console_setcolor ( VGA_COLOR_BLUE, VGA_COLOR_WHITE);
      puts(banner);
      vga_console_setcolor ( VGA_COLOR_BLACK, VGA_COLOR_YELLOW );
 
-//------------------
+     vga_cursor_enable (0, 15);
+     vga_cursor_setposition (20,1);
 
+//------------------
+/*
      vga_console_setcolor ( VGA_COLOR_WHITE, VGA_COLOR_BLACK);
      puts ("\n\n[VGA test]\n");
      vga_console_setcolor ( VGA_COLOR_BLACK, VGA_COLOR_YELLOW);
-
+*/ 
      /*
      .---------------------------------------.
      | TEST Scroling e dimensionamento video |
      '---------------------------------------' */
-
+/*
      puts("[riga-01]+123456789+123456789+123456789+123456789+123456789+123456789+123456789+");
      puts("[riga-02]+123456789+123456789+123456789+123456789+123456789+123456789+123456789+");
      puts("[riga-03]+123456789+123456789+123456789+123456789+123456789+123456789+123456789+");
@@ -54,7 +59,7 @@ void kmain(void)
      puts("[riga-08]+123456789+123456789+123456789+123456789+123456789+123456789+123456789+");
      puts("[riga-09]+123456789+123456789+123456789+123456789+123456789+123456789+123456789+");
      puts("[riga-10]+123456789+123456789+123456789+123456789+123456789+123456789+123456789+");
-
+*/
 /*
      puts("[riga-11]+123456789+123456789+123456789+123456789+123456789+123456789+123456789+");
      puts("[riga-12]+123456789+123456789+123456789+123456789+123456789+123456789+123456789+");
@@ -78,7 +83,7 @@ void kmain(void)
      puts("[riga-29]+123456789+123456789+123456789+123456789+123456789+123456789+123456789+");
      puts("[riga-30]+123456789+123456789+123456789+123456789+123456789+123456789+123456789+");
 */
-
+/*
      vga_console_setcolor ( VGA_COLOR_RED, VGA_COLOR_YELLOW );
      puts("< ULTIMA | ");
      vga_console_setcolor ( VGA_COLOR_BLACK, VGA_COLOR_YELLOW );
@@ -96,18 +101,25 @@ void kmain(void)
 
      vga_font_setcolor ( VGA_COLOR_CYAN, VGA_COLOR_WHITE, 50, 23);
 
-     vga_console_setcolor ( VGA_COLOR_BLACK, VGA_COLOR_RED );
+*/
+/*
      vga_console_setposition (0,0);
-     putchar(' ');
-
-     vga_cursor_enable (10, 15);
-     vga_cursor_setposition (10,0);
+     vga_console_setcolor ( VGA_COLOR_BLUE, VGA_COLOR_WHITE);
+     puts(banner); 
+*/
+     //--------
+     vga_cursor_enable (0, 15);
+     vga_cursor_setposition (0,1);
 
      /*
      .-------------------------.
      | fake APPL : gameOfLife  |
      '-------------------------' */
-//   gamelife();
+     vga_console_setcolor ( VGA_COLOR_BLUE, VGA_COLOR_WHITE);
+     puts("Starting APPL:TheGameOfLife...");
+     vga_console_setcolor ( VGA_COLOR_BLACK, VGA_COLOR_YELLOW );
+
+     gameOfLife();
  
      for (;;)
      {   

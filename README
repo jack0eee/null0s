@@ -1,0 +1,66 @@
+null0s kernel anarchico-libertario.  
+
+si tratta di un kernel minimale, nulla altro che
+un progetto allo stato molto embrionale.
+In effetti volevo capire come far partire un'applicazione
+senza alcun sistema operativo. Avrei dovuto poggiarmi 
+su UEFI o bios, come fanno alcuni nerd matti (amici miei)
+ma poi mi son detto: bene! perche' non farlo inplementando 
+un kernel minimale, in questo modo avrei imparato 
+anche qualcosa di nuovo.
+Anni fa (con il dos) ho provato ad usare il bios.
+Ricordo che il mouse (seriale) ad esempio riuscivo
+ad usarlo tramite INT 33h (se non ricordo male), 
+pero il bios pare che stia sempre piu' in fase di
+lenta dismissione per UEFI/EFI (che in realta' 
+conosco molto poco. Pare che sia un grosso aiuto
+per chi voglia avviare applicazioni senza alcun sistema
+operativo. A me sembra gia' di suo un sistema operativo,
+mi basta questo per non usarlo. :D 
+
+Son sempre stato attratto dal discorso driver, ossia 
+meccanismi e programmazione a basso livello, parlare 
+con i dispositivi hardware periferici. Purtroppo 
+non ne ho mai avuto l'opportunita di farlo,   
+ma forse le opportunita' te le devi pure cercare.
+Se ti incuriosisce un argomento, prima o poi  
+dovrai affrontarlo, e per me questo e' il momento
+di farlo.
+
+Quetso progetto e' iniziato, ma potrebbe terminare
+in qualsiasi momento, per poi essere ripreso tra
+10 anni o mai piu'. Non importa.
+
+Se volete unirmi a me nell'esplorazione, siete i
+benvenuti. Non preoccupatevi se avete poche conoscenze,
+nemmeno io ne ho, e non sono un mago del C o
+dell'assembler.   
+
+L'attuale stato e' questo :
+
+* Supporta solo l'architettura a 32bit (i386) 
+* Boot solo con qemu, quindi non su hardware reale.
+* Ha una libc minimalissima.
+* Come device di OUTPUT drive VGA (testuale 80x25) 
+* Nessun device di INPUT supportato. 
+
+Tieni d'occhio il file TODO, per funzionalita'
+che penso di includere ai prossimi commit.
+
+--------
+
+Tutto il software viene rilasciato con licenza GNU GPL v3.
+di Free Software Foundation
+
+                                       -- jack0e
+
+Roma, 09/06/2026
+
+
+buon divertimento!
+happy hacking
+
+
+========----------
+
+ 
