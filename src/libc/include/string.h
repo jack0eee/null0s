@@ -18,24 +18,24 @@ char  *strcat  (char *restrict dest, const char *restrict src);
 char  *strncat (char *restrict dest, const char *restrict src, size_t n);
 
 
-/* --- ricerca e scansione [3/6] --- */ 
+/* --- ricerca e scansione [4/6] --- */ 
 
 char  *strchr  (const char *s, int c);                         
 char  *strrchr (const char *s, int c);                             
 char  *strstr  (const char *haystack, const char *needle);         
-char  *strpbrk (const char *s, const char *accept);               // NO 1 
-size_t strspn  (const char *s, const char *accept);               // NO 2 
-size_t strcspn (const char *s, const char *reject);               // NO 3 
+char  *strpbrk (const char *s, const char *accept);                
+size_t strspn  (const char *s, const char *accept);  
+size_t strcspn (const char *s, const char *reject);  
 
 
 /* --- tokenizzazione [0/1] --- */ 
 
-char  *strtok (char *s, const char *delim);                       // NO 4 
+char  *strtok (char *s, const char *delim);                       // NO 1 
 
 
 /* --- gestione errori [0/1] --- */
 
-//     strerror                                                   // NO 5 
+char  *strerror (int errnum);                                     // NO 2 
 
 
 /* --- funzioni su memoria grezza / ignorano il terminatore [5] --- */
@@ -46,7 +46,7 @@ void  *memmove (void *dest     , const void *src , size_t n);
 int    memcmp  (const void *s1 , const void *s2  , size_t n);
 void  *memchr  (const void *s  , int c           , size_t n);
 
-// ------ in elenco : 20 -- implementate : 15 -- da implementare : 5  
+// ------ in elenco : 20 -- implementate : 18 -- da implementare : 2  
  
 #endif 
 

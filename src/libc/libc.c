@@ -12,19 +12,321 @@
 
 #include "stdio.h"
 #include "string.h"
+#include "ctype.h"
+
+/* =============== CTYPE | ANSI ================= */
+
+/*
+.--------------------------------------------------.
+| isdigit | il carattere e' un numero, cioe'       |
+|           compreso tra 0 e 9 ? Restituisce 0     |
+|           se e' false ed 1 se e' vero.           | 
+'--------------------------------------------------' */
+int isdigit (int c)
+{
+    if ( c >= '0' && c <= '9' ) 
+    { 
+         return 1 ;
+    }
+    else 
+    {
+         return 0 ;
+    };
+};
+
+/*
+.--------------------------------------------------.
+| isalpha | il carattere e' un alfabetico, cioe'   |
+|           compreso tra 'a' e 'z' o tra 'A' e 'Z' |
+|           Restituisce 0 se e' falso ed 1 se e'   |
+|           vero.                                  |
+'--------------------------------------------------' */
+int isalpha (int c)
+{
+    if (( c >= 'a' && c <= 'z' ) || 
+        ( c >= 'A' && c <= 'Z' )) 
+    {
+         return 1 ;
+    }
+    else   
+    {
+         return 0 ;
+    };
+};
+
+/*
+.--------------------------------------------------.
+| isalnum | Il carattere e' alfanumerico : numero  |
+|           o un carattere alfabetico, ossia       |
+|           compreso tra 'a' e 'z' oppure tra 'A'  |
+|           e 'Z', oppure ancora tra '0' e '9'.    |
+|           Se questa condizione e' falsa la       |
+|           funzione restituisce 0, se e' vera     |
+|           restituisce 1.                         |
+'--------------------------------------------------' */
+int isalnum (int c)
+{
+    if (( c >= 'a' && c <= 'z' ) || 
+        ( c >= 'A' && c <= 'Z' ) ||
+        ( c >= '0' && c <= '9' ))
+    {
+         return 1 ;
+    }
+    else  
+    {
+         return 0 ;
+    };
+};
+
+/*
+.--------------------------------------------------.
+| isspace | Il carattere e' uno spazio o comunque  |
+|           ricondotto ad esso, dal C. Quindi :    |
+|                                                  |
+|           nome             carattere    ascii    |
+|           -----------------------------------    |
+|           space            ' '           (32)    | 
+|           tab orizzontale  '\t'           (9)    |
+|           nuova riga       '\n'          (10)    |
+|           tab verticale    '\v'          (11)    |
+|           form feed        '\f'          (12)    |
+|           carriage return  '\r'          (13)    | 
+|                                                  |
+'--------------------------------------------------' */
+int isspace (int c)
+{
+    if ( c == ' '  || 
+         c == '\t' ||
+         c == '\n' ||
+         c == '\v' ||
+         c == '\f' || 
+         c == '\r' )
+    {
+         return 1 ;
+    }
+    else
+    {
+         return 0 ;
+    };
+};
+
+/*
+.--------------------------------------------------.
+| islower | il carattere e' un alfabetico          |
+|           minuscolo, cioe' compresso tra 'a' e   |
+|           'z'. Restituisce 0 se e' falso e 1 se  |
+|           vero.                                  |
+'--------------------------------------------------' */
+int islower (int c)
+{
+    if ( c >= 'a' && c <= 'z' ) 
+    {
+         return 1 ;
+    }
+    else
+    {
+         return 0 ;
+    };
+};
+
+/*
+.--------------------------------------------------.
+| isupper | il carattere e' un alfabetico          |          
+|           maiuscolo, cioe' compresso tra 'A' e   |          
+|           'Z'. Restituisce 0 se e' falso e 1 se  |           
+|           vero.                                  |
+'--------------------------------------------------' */
+int isupper (int c)
+{
+    if ( c >= 'A' && c <= 'Z' ) 
+    {
+         return 1 ;
+    }
+    else
+    {
+         return 0 ;
+    };
+};
+
+/*
+.--------------------------------------------------.
+| isxdigit | il carattere e' in numero esadecimale |
+|            ossia compreso da '0' a '9', oppure   |
+|            da 'a' a 'f', oppure da 'A' ad 'F'.   |
+|            Insomma che sia all'interno di questo |
+|            set : '0123456789ABCDEFabcdef'.       |
+|            Restituisce 0 per falso ed 1 se vero. | 
+'--------------------------------------------------' */
+int isxdigit (int c)
+{
+    if (( c >= '0' && c <= '9' ) ||
+        ( c >= 'A' && c <= 'F' ) ||
+        ( c >= 'a' && c <= 'f' ))
+    {
+         return 1 ;
+    }
+    else
+    {
+         return 0 ;
+    };
+};
+
+/*
+.--------------------------------------------------.
+| isprint | Verifica che sia un carattere          |
+|           stampabile, ossia, in ASCII, compreso  |
+|           tra lo spazio (32) e tilde (~)(126).   |
+|           Restituisce 0 per falso ed 1 se vero.  |
+'--------------------------------------------------' */
+int isprint (int c)
+{
+    if ( c >= ' ' && c <= '~' )
+    {
+         return 1 ;
+    }
+    else
+    {
+         return 0 ;
+    };
+};
+
+/*
+.--------------------------------------------------.
+| isgraph | Verifica che sia un carattere          |
+|           visibile, ossia, in ASCII, compreso    |
+|           tra lo spazio (32) e tilde (~)(126) :  |
+|           A differenza di isprint(), esclude lo  |
+|           spazio, perche' non visibile.          |
+|           Restituisce 0 per falso ed 1 se vero.  |
+'--------------------------------------------------' */
+int isgraph (int c)
+{
+    if ( c > ' ' && c <= '~' )
+    {
+         return 1 ;
+    }
+    else
+    {
+         return 0 ;
+    };
+};
+
+/*
+.--------------------------------------------------.
+| iscntrl | Verifica se e' un carattere di         |
+|           controllo, quindi compreso da 0 a 31,  |
+|           o 127 (DEL). Restituisce 1 se e' vero  |
+|           e 0 se e' falso.                       |
+'--------------------------------------------------' */
+int iscntrl (int c)
+{
+    if (( c >= 0 && c <= 31 ) || c == 127 )
+    {
+         return 1 ;
+    }
+    else
+    {
+         return 0 ;
+    };
+};
+
+/*
+.--------------------------------------------------.
+| ispunct | Verifica che sia un segno di           |
+|           puntegiatura, quindi :                 |
+|                                                  |
+|           * stampabile           32..126 (~)     |
+|           * non uno spazio.      32              | 
+|           * non un numero        48..57  (0-9)   | 
+|           * non una lettera (M)  65..90  (A-Z)   |
+|           * non una lettera (m)  97..122 (a-z)   |
+|                                                  |
+|           pertanto: 33-47, 58-64, 91-96          |
+|           i range in cui e' definita la          |
+|           punteggiatura.                         |
+|                                                  |
+|           Restuisce 1 se la condizione e' vera   |
+|           o 0 se la condizione e' falsa.         |
+'--------------------------------------------------' */
+int ispunct (int c)
+{
+    if (( c > ' ' && c <= '~' ) &&
+        ( c < 'a' || c  > 'z' ) && 
+        ( c < 'A' || c  > 'Z' ) &&
+        ( c < '0' || c  > '9' )) 
+       return 1 ;
+    
+    return 0;
+};
+
+/*
+.--------------------------------------------------.
+| isblank | (+++add C99) Verifica che sia uno      |
+|           uno spazio orizzontale : ' ' o '\t'.   |
+|           Restituisce 0 per falso ed 1 se vero.  |
+'--------------------------------------------------' */
+int isblank (int c)
+{
+    if ( c == ' '  || c == '\t' ) 
+    {
+         return 1 ;
+    }
+    else
+    {
+         return 0 ;
+    };
+};
+
+/*
+.--------------------------------------------------.
+| tolower | Se il carattere e' alfabetico          |
+|           maiuscolo, ossia compreso tra 'A' e    |
+|           'Z', restituisce il corrispondente     |
+|           minuscolo. In caso contrario ritorna   |
+|           il carattere ricevuto.                 |
+|           La distanza tra maiuscolo e minuscolo  |
+|           e' 32, nella tabella dei codici ASCII. |
+'--------------------------------------------------' */
+int tolower (int c)
+{
+    if ( c >= 'A' && c <= 'Z' )
+         return c + 32 ;
+    
+    return c;
+};
+
+/*
+.--------------------------------------------------.
+| toupper | Se il carattere e' alfabetico          |
+|           minuscolo, ossia compreso tra 'a' e    |
+|           'z', restituisce il corrispondente     |
+|           minuscolo. In caso contrario ritorna   |
+|           il carattere ricevuto.                 |
+|           La distanza tra minuscolo e maiuscolo  |
+|           e' -32, nella tabella codici ASCII.    |
+'--------------------------------------------------' */
+int toupper (int c) 
+{
+    if ( c >= 'a' && c <= 'z' )
+         return c - 32 ;
+    
+    return c;
+};
+
 
 /* =============== STDIO | ANSI ================= */
       
 /*
 .--------------------------------------------------.
-| puts | funzione che stampa una stringa           |
-| in output. Prende come parametro il puntatore    |
-| alla stringa, definita di sola lettura, quindi   |
-| la funzione non potra' modificare 'str', e       |
-| restituisce in un 'int' i numero dei caratteri   |
-| scritti o l'esito negativo. Al suo interno       |                      
-| per stampare il singolo carattere utilizza a sua |                      
-| volta la funzione putchar.                       |
+| puts | funzione che stampa una stringa in        |
+|        output. Prende come parametro il          |
+|        puntatore alla stringa, definita di sola  |
+|        lettura, quindi la funzione non potra'    |
+|        modificare 'str', e restituisce in un     |
+|        'int' i numero dei caratteri scritti o    |
+|        l'esito negativo. Al suo interno per      |                      
+|        stampare il singolo carattere utilizza a  |                      
+|        sua volta la funzione putchar.            |
 '--------------------------------------------------' */
 int puts ( const char *str ) 
 {
@@ -45,10 +347,11 @@ int puts ( const char *str )
 /*
 .--------------------------------------------------.
 | putchar | funzione che stampa un carattere       |
-| in output. Prende come parametro il              |
-| carattere da stampare e restituisce l'esito      |
-| dell'operazione. Al momento al suo interno       |
-| scrive direttamente nella memoria video VGA.     |
+|           in output. Prende come parametro il    |
+|           carattere da stampare e restituisce    |
+|           l'esito dell'operazione. Al momento al |
+|           suo interno scrive direttamente nella  |
+|           memoria video VGA.                     |
 '--------------------------------------------------' */
 int putchar ( int c )
 {
@@ -56,6 +359,7 @@ int putchar ( int c )
 
      return 0;
 }
+
 
 /* ================= STRING (funzioni stringhe) ================ */
 
@@ -526,6 +830,16 @@ char *strrchr(const char *s, int c)
 |          stringa (haystack). Se la sottostringa    |
 |          da ricercare e' vuota '' torna il         |
 |          puntatore alla stringa haystack.          |
+|                                                    |
+|          POSSIBILE OTTIMIZZAZIONE!!!!!!!!!!!!!!    |
+|          Cio' che non viene testato, invece e'     |
+|          che la lunghezza di 'needle' non sia      |
+|          maggiore di 'haystack', in questo caso    |
+|          sarebbe inutile cercare una sottostringa  |
+|          piu' grande di una stringa. Cosi come     |
+|          non ha piu' senso cercare una sottostring |
+|          quando rimane da analizzare una parte     |
+|          della stringa con lunghezza minore.       |
 '----------------------------------------------------' */
 char *strstr (const char *haystack, const char *needle)
 {
@@ -597,47 +911,295 @@ char *strstr (const char *haystack, const char *needle)
 /*
 .----------------------------------------------------.
 | strpbrk| cerca il primo carattere appartenente ad  |
-|          un set.                                   |
+|          un set. E' un po' simile alla strchr, ma  |
+|          anziche' cercare il singola carattere, ne |
+|          cerca piu' di uno fermandosi al primo     |
+|          trovato nella stringa tra quelli buoni    |
+|          (accettati, accept). Se nella stringa non |
+|          ne trova nessuno, allora restituisce,     |
+|          NULL (come la strchr). La funzione scorre |
+|          entrambe le string (s ed accept) fino a   |
+|          trovare il carattere di fine stringa '\0' |
 '----------------------------------------------------' */
 char *strpbrk (const char *s, const char *accept)
 {
-      return (char *)s; //????
+    // size_t len_s = 0 ;
+    // size_t len_a = 0 ;
+
+      /*
+       * Fa una copia dell'indirizzo iniziale di memoria
+       * di accept per poterlo preservare, ed
+       * utilizzarne la copia (a) */
+       const char *a = accept ;
+
+      /*
+       * Ciclo di lettura della stringa 's' fino
+       * a che non trova un carattere di fine stringa '\0' */
+       while(*s)
+       { 
+         /* 
+          * Per ogni carattere letto di 's', inizia un ciclo di lettura
+          * dell'array 'accept' fino a che non trova anche qui il 
+          * carattere di fine stringa '\0'. Se trova il fine stringa significa
+          * che nessun carattere accettato e' stato trovato, quindi riposiziona
+          * il puntatore all'inizio di accept e si prepara a leggere il carattere
+          * successivo di 's'. Se invece il carattere letto di 's' e' 
+          * uguale ad uno dei caratteri accettati, eve immediatamente
+          * dalla funzione restituendo il puntatore/locazione di memoria
+          * attuale di 's'. */
+          while (*a)
+          {
+               if (*s==*a)
+                   return (char *)s;
+
+               a++;
+
+            // len_s++;
+            // if (len_a > 4096)
+            //    panic("strpbrk: stringa (accept) non terminata, over 4k");
+
+          }
+          a = accept ;
+
+          s++;
+
+          // len_s++;
+          // if (len_s > 4096)
+          //    panic("strpbrk: stringa (s) non terminata, over 4k");
+       }
+
+       return NULL;
 }
 
 /*
 .----------------------------------------------------.
 | strspn | conta quanto inizio di stringa e' letto   |
 |          solo incontrando caratteri validi. Si     |
-|          ferma al primo carattere non valido.      |
+|          ferma al primo carattere non valido,      |
+|          cioe' non presente nell'insieme degli     |
+|          accettati, oppure a fine stringa, nel     |
+|          caso siano tutti in tale insieme. La      |
+|          funzione torna quanti caratteri son       |
+|          risultati validi fino all'interruzione.   |
 '----------------------------------------------------' */
 size_t strspn (const char *s, const char *accept)
 {
-      return 0;
+    // size_t len_s = 0 ;
+    // size_t len_a = 0 ;
+
+      /*
+       * Contatore dei caratteri della stringa 's'
+       * presenti nell'insieme dei caratteri accettati */
+       size_t count_accept = 0;
+
+      /*
+       * Fa una copia dell'indirizzo iniziale di memoria
+       * di accept per poterlo preservare, ed
+       * utilizzarne la copia (a) */
+       const char *a = accept ;
+       
+      /*
+       * Ciclo di lettura della stringa 's' fino
+       * a che non trova un carattere di fine stringa '\0' */
+       while(*s)
+       {
+         /*
+          * Per ogni carattere letto di 's', inizia un ciclo di lettura
+          * dell'array 'accept' fino a che non trova anche qui il
+          * carattere di fine stringa '\0'. Esce dal ciclo di letture, 
+          * per due condizioni: [1] se trova il fine stringa 
+          * [2] se trova che il carattere della stringa (s) appartiene
+          * all'insieme dei caratteri accettati. */ 
+          while (*a || *s==*a)
+          {
+               if (*s!=*a)
+                   a++;
+
+            // len_s++;
+            // if (len_a > 4096)
+            //    panic("strspn: stringa (accept) non terminata, over 4k");
+
+          }
+
+         /* Quando il ciclo di lettura termina per uno dei due motivi, sopra elencati 
+          * eseguo la verifica che accerta che il carattere di 's' analizzato
+          * non appartiene all'insieme dei caratteri accettati. In tal caso 
+          * esce dalla funzione restituendo il numero accettati fino a quel 
+          * momento letti, della stringa s.  */
+          if (*a == '\0' && *s != *a)
+               return count_accept ; 
+
+         /* Incrementa il contatore dei caratteri di 's' nell'insieme 
+          * di quelli accettati */
+          count_accept++;
+
+         /* Se mi trovi qui, tutto procede: ogni carattere letto della stringa
+          * appartiene all'insieme dei caratteri accettati, quindi: ripristina
+          * il puntatore di accept e si prepara a leggere il carattere
+          * successivo della stringa (s) */ 
+          a = accept ;
+
+          s++;
+
+          // len_s++;
+          // if (len_s > 4096)
+          //    panic("strspn: stringa (s) non terminata, over 4k");
+       }
+
+       return count_accept;
 }
 
 /*
 .----------------------------------------------------.
+| strcspn| conta quanto inizio di stringa e' letto   |
+|          solo incontrando caratteri validi. Si     |
+|          ferma al primo carattere non valido,      |
+|          cioe' presente nell'insieme dei caratteri |
+|          non accettati (reject), oppure a fine     |
+|          stringa, nel caso nessun sia in tale      |
+|          insieme. La funzione torna quanti         |
+|          caratteri son risultati validi, fino      |
+|          all'interruzione.                         |
 '----------------------------------------------------' */
 size_t strcspn (const char *s, const char *reject)
 {
-      return 0;
+    // size_t len_s = 0 ;
+    // size_t len_r = 0 ;
+
+      /*
+       * Contatore dei caratteri della stringa 's'
+       * non presenti nell'insieme dei caratteri 
+       * non accettati (reject) */
+       size_t count_accept = 0;
+
+      /*
+       * Fa una copia dell'indirizzo iniziale di memoria
+       * di accept per poterlo preservare, ed
+       * utilizzarne la copia (a) */
+       const char *r = reject ;
+
+      /*
+       * Ciclo di lettura della stringa 's' fino
+       * a che non trova un carattere di fine stringa '\0' */
+       while(*s)
+       {
+         /*
+          * Per ogni carattere letto di 's', inizia un ciclo di lettura
+          * dell'array 'reject' fino a che non trova anche qui il
+          * carattere di fine stringa '\0'. Esce dal ciclo di letture,
+          * per due condizioni: [1] se trova il fine stringa
+          * [2] se trova che il carattere della stringa (s) appartiene
+          * all'insieme dei caratteri *non* accettati (r). */
+          while (*r && *s!=*r)
+          {
+               if (*s!=*r)
+                   r++;
+
+            // len_r++;
+            // if (len_r > 4096)
+            //    panic("strcspn: stringa (reject) non terminata, over 4k");
+
+          }
+
+         /* Quando il ciclo di lettura termina per uno dei due motivi, sopra elencati,
+          * eseguo la verifica che accerta che il carattere di 's' analizzato
+          * appartenga all'insieme dei caratteri non accettati (reject). In tal caso
+          * esce dalla funzione restituendo il numero di caratteri che 
+          * fino a quel momento son stati letti, e son risultati validi. */
+          if (*r != '\0' && *s == *r)
+               return count_accept ;
+
+         /* Incrementa il contatore dei caratteri di 's' nell'insieme
+          * di quelli accettati */
+          count_accept++;
+
+         /* Se mi trovi qui, tutto procede: ogni carattere letto della stringa
+          * non appartiene all'insieme dei caratteri non validi (reject), 
+          * quindi: ripristina il puntatore di reject e si prepara a leggere 
+          * il carattere successivo della stringa (s) */
+          r = reject ;
+
+          s++;
+
+          // len_s++;
+          // if (len_s > 4096)
+          //    panic("strcspn: stringa (s) non terminata, over 4k");
+       }
+
+       return count_accept;
 }
 
 
 /* ======== STRING (tokenizzazione) ========================== */
-
+/* =============== SONO QUI ================ */
 /*
 .----------------------------------------------------.
+| strtok | viene passato l'indirizzo alla stringa s  |
+|          e alla stringa di delimitazione. Lo scopo |
+|          della funzione e trovare la sottostringa  |
+|          alla sinistra del delimitatore passato.   |
+|                                                    | 
+|          Es. s="mele, pere, limoni\0" - delim=", " |         
+|                                                    |
+|          Se trova il delimitatore, sostituisce     |
+|          questo con un carattere di fine stringa   |
+|          e restituisce il puntatore ad inizio      |
+|          stringa s.                                |
+|                                                    |
+|          Es. s="mele\0pere, limoni\0"              | 
+|                 ^                                  |
+|          Per trovare i successivi token, va        |
+|          rieseguita la funzione, impostando come   |
+|          stringa non piu' il puntatore s, ma NULL. |
+|                                                    |
+|          Es. strtok (NULL, delim); // delim=", "   |
+|                                                    | 
+|          La funzione cerchera' il delimitatore     |
+|          dal primo carattere di fine stringa in    |
+|          fino al delimitatore o alla fine stringa  |
+|          tornando il puntatore al successivo       |
+|          token.                                    |
+|                                                    |
+|          Es. s="mele\0pere\0, limoni\0"            |
+|                       ^                            |
+|          Al terza esecuzione, strtok restituira'   |
+|          il puntatore al terzo token.              |
+|                                                    |
+|          Es. s="mele\0pere\0limoni\0"              |
+|                             ^                      |
+|          Se rieseguita, restituira' da quel        |
+|          momento in poi NULL, che significa che i  |
+|          token son finiti                          |
+|                                                    |
+|          Si deduce quanto :                        |
+|                                                    |
+|          Se il delimitatore non viene trovato, il  |
+|          token e' delimitato quindi dal carattere  |
+|          di fine stringa '\0'.                     |
+|                                                    |
+|          Casi particolare :                        |
+|                                                    |
+|          - Stringa Vuota o con soli delimitatori   |
+|                                                    |
+|          Ritorna NULL                              |
+|                                                    | 
 '----------------------------------------------------' */
 char *strtok (char *s, const char *delim)
 {
-      return 0;
+ 
+      return s;
 }
 
 
 /* ======== STRING (gestione errori) =================================== */
 
-// strerror
+/*
+.----------------------------------------------------.
+'----------------------------------------------------' */
+char *strerror (int errnum)
+{
+      return 0;
+}
 
 
 /* ======== STRING (funzioni su memoria grezza | ignorano il terminatore '\0') ======== */
