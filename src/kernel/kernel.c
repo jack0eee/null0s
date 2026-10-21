@@ -34,6 +34,8 @@ void kmain(void)
      vga_cursor_enable (0, 15);
      vga_cursor_setposition (20,1);
 
+     printf("Evviva sono [%s][%%]*FINE*", banner, 10); 
+
 //------------------
 /*
      vga_console_setcolor ( VGA_COLOR_WHITE, VGA_COLOR_BLACK);

@@ -3,8 +3,9 @@
 #include "io.h"
 
 /*
- * Funzione Read Registro Dispositivo 
- */
+.------------------------------------.
+| Funzione Read Registro Dispositivo | 
+'------------------------------------' */
 unsigned char device_read(device_t *dev, unsigned int registro)
 {
      switch (dev->type)
@@ -19,8 +20,9 @@ unsigned char device_read(device_t *dev, unsigned int registro)
 };
 
 /*
- * Funzione Write Registro Dispositivo
- */
+.-------------------------------------.
+| Funzione Write Registro Dispositivo |
+'-------------------------------------' */
 void device_write(device_t *dev, unsigned int registro, unsigned char valore)
 {
      switch (dev->type)

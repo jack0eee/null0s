@@ -1,0 +1,19 @@
+README. Posix.
+
+Posix e' l'interfaccia tra le applicazioni in user-space
+ed il kernel-space. E' essenzialmente l'esposizione 
+dei servizi offerti dal kernel con un interfaccia
+standard. E' necessario implementare posix se l'obbiettivo
+e' quello di compilare l'enorme collezione di software
+libero disponibile.
+
+Questa implementazione dell'estensione Posix
+di libc, fa riferimento alla versione della specifica :
+
+POSIX.1-2008
+
+
+--------
+
+
+
