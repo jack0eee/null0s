@@ -137,7 +137,7 @@ static int print_unsigned (unsigned int n, unsigned int base, int uppercase)
 
     while (len > 0) {
         putchar(buffer[--len]);
-        count++;
+        ++count;
     }
 
     return count;
@@ -256,14 +256,17 @@ int printf (const char *format, ...)
                            }
 
                            count += print_unsigned(magnitude, 10, 0);
+                           break;
                        }
 
              case 'o': count += print_unsigned ( va_arg(args, unsigned int), 8, 0);
                        break;
 
              case 'x': count += print_unsigned ( va_arg(args, unsigned int), 16, 0);
+                       break;
 
              case 'X': count += print_unsigned ( va_arg(args, unsigned int), 16, 1);
+                       break;
 
              default : /* specifica non supportata : la mostra letteralmente */ 
                        putchar('%');

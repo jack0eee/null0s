@@ -8,7 +8,15 @@
 '-----------------------------------------------------' */
 
 #include "stdio.h"
+
+
+/*
+.-----------------.
+| FakeApplication |
+'-----------------' */
 #include "gameOfLife.h"
+#include "printIntSizeof.h"
+
 
 void kmain(void)
 {
@@ -34,7 +42,6 @@ void kmain(void)
      vga_cursor_enable (0, 15);
      vga_cursor_setposition (20,1);
 
-     printf("Evviva sono [%s][%%]*FINE*", banner, 10); 
 
 //------------------
 /*
@@ -117,12 +124,26 @@ void kmain(void)
      .-------------------------.
      | fake APPL : gameOfLife  |
      '-------------------------' */
+     /*
      vga_console_setcolor ( VGA_COLOR_BLUE, VGA_COLOR_WHITE);
      puts("Starting APPL:TheGameOfLife...");
-     vga_console_setcolor ( VGA_COLOR_BLACK, VGA_COLOR_YELLOW );
 
+     vga_console_setcolor ( VGA_COLOR_BLACK, VGA_COLOR_YELLOW );
      gameOfLife();
- 
+     */ 
+
+     /*
+     .--------------------------------------------.
+     | fake APPL : printIntSizeof | stdint.h test |
+     '--------------------------------------------' */
+     vga_console_setcolor ( VGA_COLOR_BLUE, VGA_COLOR_WHITE);
+     puts("Starting APPL:printIntSizeof...");
+
+     vga_console_setcolor ( VGA_COLOR_BLACK, VGA_COLOR_YELLOW );
+     printIntSizeof();
+
+
+
      for (;;)
      {   
             __asm__ __volatile__("hlt");
