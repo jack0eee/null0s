@@ -22,28 +22,30 @@
 
 #--- Architettura : i386 
 ARCH=i386
+CC=clang 
 
 #-------------------
 PATH_HOME=~/null0s
 PATH_SOURCE=$PATH_HOME/src
+#---
 PATH_SOURCE_BOOT=$PATH_SOURCE/boot/arch/$ARCH
-PATH_SOURCE_ARCH=$PATH_SOURCE/arch/$ARCH
 PATH_SOURCE_LIBC=$PATH_SOURCE/libc
-#---
 PATH_SOURCE_APPL=$PATH_SOURCE/appl
-#---
 PATH_SOURCE_KERNEL=$PATH_SOURCE/kernel
+#---
 PATH_BUILD=$PATH_HOME/build
 #------------------------------
 
 case "$ARCH" in 
 
    i386) 
-         opz="-m32"
+         AFLAGS="-m32 -target i386-unknown-elf"
+         CFLAGS="-m32 -target i386-unknown-elf -ffreestanding -fno-stack-protector -fno-pic -fno-pie -fno-builtin" 
          ;;
 
-   x64)  
-         opz="-m64"
+   x86-64)  
+         AFLAGS="-m64"
+         CFLAGS="-m64 -ffreestanding -fno-stack-protector -fno-pic -fno-pie -fno-builtin" 
          ;;
 
    *)    
@@ -52,7 +54,7 @@ case "$ARCH" in
          ;;
 esac
 
-echo "build null0s ($ARCH|$opz) ..."
+echo "build null0s ($ARCH|$CFLAGS)"
 
 #.--------.
 #| clean  |
@@ -63,7 +65,7 @@ echo "build null0s ($ARCH|$opz) ..."
 #|                                              |
 #'----------------------------------------------'
 echo "clean $PATH_SOURCE (*.$ARCH.o)"
-find $PATH_SOURCE -name *.$ARCH.o -exec rm {} + 
+find $PATH_SOURCE -name "*.$ARCH.o" -exec rm {} + 
 
 #.--------.
 #| boot.s | 
@@ -73,8 +75,8 @@ find $PATH_SOURCE -name *.$ARCH.o -exec rm {} +
 #|                                              |
 #|                                              |
 #'----------------------------------------------'
-echo "build $PATH_SOURCE_BOOT/boot.$ARCH.s -> boot.$ARCH.o"
-cc $opz \
+echo "$CC $PATH_SOURCE_BOOT/boot.$ARCH.s -> boot.$ARCH.o"
+$CC $AFLAGS \
    -c $PATH_SOURCE_BOOT/boot.$ARCH.s \
    -o $PATH_SOURCE_BOOT/boot.$ARCH.o
 
@@ -89,14 +91,10 @@ cc $opz \
 #| Dipendenze : nessuna.                        |
 #|                                              |
 #'----------------------------------------------'
-echo "build $PATH_SOURCE_ARCH/io.c -> io.$ARCH.o"
-cc $opz \
-   -ffreestanding \
-   -fno-stack-protector \
-   -fno-pic \
-   -fno-pie \
-   -c $PATH_SOURCE_ARCH/io.c \
-   -o $PATH_SOURCE_ARCH/io.$ARCH.o
+echo "$CC $PATH_SOURCE_KERNEL/drivers/base/io.c -> io.$ARCH.o"
+$CC $CFLAGS \
+   -c $PATH_SOURCE_KERNEL/drivers/base/io.c \
+   -o $PATH_SOURCE_KERNEL/drivers/base/io.$ARCH.o
 
 #.-----------------------.
 #| driver -> device_io.o |
@@ -108,19 +106,14 @@ cc $opz \
 #| Dipendenze : io.o                            |
 #|                                              |
 #'----------------------------------------------'
-echo "build $PATH_SOURCE_KERNEL/drivers/base/device_io.c -> device_io.$ARCH.o"
-cc $opz \
-   -ffreestanding \
-   -fno-stack-protector \
-   -fno-pic \
-   -fno-pie \
-   -I $PATH_SOURCE_ARCH \
+echo "$CC $PATH_SOURCE_KERNEL/drivers/base/device_io.c -> device_io.$ARCH.o"
+$CC $CFLAGS \
    -c $PATH_SOURCE_KERNEL/drivers/base/device_io.c \
    -o $PATH_SOURCE_KERNEL/drivers/base/device_io.$ARCH.o
 
-#.-----------------------.
-#| driver -> video/vga.o |
-#|                       '----------------------.
+#.--------------------------.
+#| driver -> video/libvga.o |
+#|                          '-------------------.
 #|                                              |
 #| Implementa il driver VGA, ossia una          |
 #| collezione di funzioni                       |
@@ -128,12 +121,8 @@ cc $opz \
 #| Dipendenze : device_io.o                     |
 #|                                              | 
 #'----------------------------------------------'
-echo "build $PATH_SOURCE_KERNEL/drivers/video/vga/lib/libvga.c -> libvga.$ARCH.o"
-cc $opz \
-   -ffreestanding \
-   -fno-stack-protector \
-   -fno-pic \
-   -fno-pie \
+echo "$CC $PATH_SOURCE_KERNEL/drivers/video/vga/lib/libvga.c -> libvga.$ARCH.o"
+$CC $CFLAGS \
    -I $PATH_SOURCE_KERNEL/drivers/base \
    -c $PATH_SOURCE_KERNEL/drivers/video/vga/libvga.c \
    -o $PATH_SOURCE_KERNEL/drivers/video/vga/libvga.$ARCH.o
@@ -150,12 +139,8 @@ cc $opz \
 #| Dipendenze : nessuna.                        |
 #|                                              |
 #'----------------------------------------------'
-echo "build $PATH_SOURCE_LIBC/ansi/ctype.c -> ctype.$ARCH.o"
-cc $opz \
-   -ffreestanding \
-   -fno-stack-protector \
-   -fno-pic \
-   -fno-pie \
+echo "$CC $PATH_SOURCE_LIBC/ansi/ctype.c -> ctype.$ARCH.o"
+$CC $CFLAGS \
    -c $PATH_SOURCE_LIBC/ansi/ctype.c \
    -o $PATH_SOURCE_LIBC/ansi/ctype.$ARCH.o
 
@@ -170,12 +155,8 @@ cc $opz \
 #| Dipendenze : nessuna.                        |
 #|                                              |
 #'----------------------------------------------'
-echo "build $PATH_SOURCE_LIBC/ansi/string.c -> string.$ARCH.o"
-cc $opz \
-   -ffreestanding \
-   -fno-stack-protector \
-   -fno-pic \
-   -fno-pie \
+echo "$CC $PATH_SOURCE_LIBC/ansi/string.c -> string.$ARCH.o"
+$CC $CFLAGS \
    -c $PATH_SOURCE_LIBC/ansi/string.c \
    -o $PATH_SOURCE_LIBC/ansi/string.$ARCH.o
 
@@ -190,12 +171,8 @@ cc $opz \
 #| Dipendenze : nessuna.                        |
 #|                                              |
 #'----------------------------------------------'
-echo "build $PATH_SOURCE_LIBC/ansi/stdlib.c -> stdlib.$ARCH.o"
-cc $opz \
-   -ffreestanding \
-   -fno-stack-protector \
-   -fno-pic \
-   -fno-pie \
+echo "$CC $PATH_SOURCE_LIBC/ansi/stdlib.c -> stdlib.$ARCH.o"
+$CC $CFLAGS \
    -c $PATH_SOURCE_LIBC/ansi/stdlib.c \
    -o $PATH_SOURCE_LIBC/ansi/stdlib.$ARCH.o
 
@@ -212,12 +189,8 @@ cc $opz \
 #|              kernel (SO multiutente)         |
 #|                                              |
 #'----------------------------------------------'
-echo "build $PATH_SOURCE_LIBC/ansi/stdio.c -> stdio.$ARCH.o"
-cc $opz \
-   -ffreestanding \
-   -fno-stack-protector \
-   -fno-pic \
-   -fno-pie \
+echo "$CC $PATH_SOURCE_LIBC/ansi/stdio.c -> stdio.$ARCH.o"
+$CC $CFLAGS \
    -I $PATH_SOURCE_KERNEL/drivers/video/vga \
    -I $PATH_SOURCE_LIBC/include/ansi/ \
    -c $PATH_SOURCE_LIBC/ansi/stdio.c \
@@ -231,12 +204,8 @@ cc $opz \
 #| librerie separate.                           |
 #|                                              |
 #'----------------------------------------------'
-#echo "build $PATH_SOURCE_LIBC/libc.c -> libc.$ARCH.o"
-#cc $opz \
-#   -ffreestanding \
-#   -fno-stack-protector \
-#   -fno-pic \
-#   -fno-pie \
+#echo "$CC $PATH_SOURCE_LIBC/libc.c -> libc.$ARCH.o"
+#$CC $CFLAGS \
 #   -I $PATH_SOURCE_KERNEL/drivers/video/vga \
 #   -I $PATH_SOURCE_KERNEL/libk \
 #   -I $PATH_SOURCE_LIBC/include/ansi \
@@ -257,12 +226,8 @@ cc $opz \
 #|              libc/ansi                       |
 #|                                              |
 #'----------------------------------------------'
-echo "build $PATH_SOURCE_APPL/gameOfLife/gameOfLife.c -> gameOfLife.$ARCH.o"
-cc $opz \
-   -ffreestanding \
-   -fno-stack-protector \
-   -fno-pic \
-   -fno-pie \
+echo "$CC $PATH_SOURCE_APPL/gameOfLife/gameOfLife.c -> gameOfLife.$ARCH.o"
+$CC $CFLAGS \
    -I $PATH_SOURCE_KERNEL/drivers/video/vga \
    -I $PATH_SOURCE_LIBC/include/ansi \
    -c $PATH_SOURCE_APPL/gameOfLife/gameOfLife.c \
@@ -280,12 +245,8 @@ cc $opz \
 #| Dipendenze : libc/ansi                       |
 #|                                              |
 #'----------------------------------------------'
-echo "build $PATH_SOURCE_APPL/printIntSizeof/printIntSizeof.c -> printIntSizeof.$ARCH.o"
-cc $opz \
-   -ffreestanding \
-   -fno-stack-protector \
-   -fno-pic \
-   -fno-pie \
+echo "$CC $PATH_SOURCE_APPL/printIntSizeof/printIntSizeof.c -> printIntSizeof.$ARCH.o"
+$CC $CFLAGS \
    -I $PATH_SOURCE_KERNEL/drivers/video/vga \
    -I $PATH_SOURCE_LIBC/include/ansi \
    -c $PATH_SOURCE_APPL/printIntSizeof/printIntSizeof.c \
@@ -302,12 +263,8 @@ cc $opz \
 #| perche' ancora in fase di sviluppo.          |
 #|                                              |
 #'----------------------------------------------'
-#echo "build $PATH_SOURCE_KERNEL/libk/libk.c -> libk.$ARCH.o"
-#cc $opz \
-#   -ffreestanding \
-#   -fno-stack-protector \
-#   -fno-pic \
-#   -fno-pie \
+#echo "$CC $PATH_SOURCE_KERNEL/libk/libk.c -> libk.$ARCH.o"
+#$CC $CFLAGS \
 #   -I $PATH_SOURCE_KERNEL/drivers/video/vga \
 #   -I $PATH_SOURCE_KERNEL/libk \
 #   -c $PATH_SOURCE_KERNEL/libk/libk.c \
@@ -321,12 +278,8 @@ cc $opz \
 #| tra la libc e l'hardware.           |
 #|                                     |
 #'-------------------------------------'
-echo "build $PATH_SOURCE_KERNEL/kernel.c -> kernel.$ARCH.o"
-cc $opz \
-   -ffreestanding \
-   -fno-stack-protector \
-   -fno-pic \
-   -fno-pie \
+echo "$CC $PATH_SOURCE_KERNEL/kernel.c -> kernel.$ARCH.o"
+$CC $CFLAGS \
    -I $PATH_SOURCE_APPL/gameOfLife \
    -I $PATH_SOURCE_APPL/printIntSizeof \
    -I $PATH_SOURCE_LIBC/include/ansi \
@@ -341,38 +294,39 @@ cc $opz \
 #|                                              |
 #|                                              |
 #'----------------------------------------------'
-echo "build $PATH_SOURCE/null0s.$ARCH.bin <- " \
-     "boot/arch/$ARCH/boot.$ARCH.o, "\
-     "arch/$ARCH/io.$ARCH.o, "\
-     "kernel/drivers/base/device_io.$ARCH.o, "\
-     "libc/libc.$ARCH.o, "\
-     "appl/gameOfLife/gameOfLife.$ARCH.o, "\
-     "kernel/kernel.$ARCH.o, "\
-     "kernel/drivers/video/vga/vga.$ARCH.o -> null0s.$ARCH.bin"
+echo "link $PATH_SOURCE/null0s.$ARCH.bin <- "\
+     "boot/arch/$ARCH/boot.$ARCH.o,"\
+     "libc/libc.$ARCH.o,"\
+     "appl/gameOfLife/gameOfLife.$ARCH.o,"\
+     "appl/printIntSizeof/printIntSizeof.$ARCH.o,"\
+     "kernel/kernel.$ARCH.o,"\
+     "kernel/drivers/base/io.$ARCH.o,"\
+     "kernel/drivers/base/device_io.$ARCH.o,"\
+     "kernel/drivers/video/vga/libvga.$ARCH.o"
 
-#cc $opz \
+#$CC $opz \
 #   -fPIC \
 #   -nostdlib \
 #   -Wl,-T,$PATH_SOURCE_KERNEL/linker.$ARCH.ld \
 #   -Wl,-z,notext \
 #   -o $PATH_SOURCE_KERNEL/null0s.$ARCH.bin \
 #      $PATH_SOURCE_BOOT/boot.$ARCH.o \
-#      $PATH_SOURCE_ARCH/io.$ARCH.o \
 #      $PATH_SOURCE_LIBC/libc.$ARCH.o \
 #      $PATH_SOURCE_APPL/gameOfLife/gameOfLife.$ARCH.o \
+#      $PATH_SOURCE_APPL/printIntSizeof/printIntSizeof.$ARCH.o \
 #      $PATH_SOURCE_KERNEL/libk/libk.$ARCH.o \
 #      $PATH_SOURCE_KERNEL/kernel.$ARCH.o \
+#      $PATH_SOURCE_KERNEL/drivers/base/io.$ARCH.o 
 #      $PATH_SOURCE_KERNEL/drivers/base/device_io.$ARCH.o \
 #      $PATH_SOURCE_KERNEL/drivers/video/vga/libvga.$ARCH.o 
 
-cc $opz \
+$CC $opz \
    -no-pie \
    -nostdlib \
    -Wl,-T,$PATH_SOURCE_KERNEL/linker.$ARCH.ld \
    -Wl,-z,notext \
    -o $PATH_SOURCE_KERNEL/null0s.$ARCH.bin \
       $PATH_SOURCE_BOOT/boot.$ARCH.o \
-      $PATH_SOURCE_ARCH/io.$ARCH.o \
       $PATH_SOURCE_LIBC/ansi/ctype.$ARCH.o \
       $PATH_SOURCE_LIBC/ansi/string.$ARCH.o \
       $PATH_SOURCE_LIBC/ansi/stdlib.$ARCH.o \
@@ -380,6 +334,7 @@ cc $opz \
       $PATH_SOURCE_APPL/gameOfLife/gameOfLife.$ARCH.o \
       $PATH_SOURCE_APPL/printIntSizeof/printIntSizeof.$ARCH.o \
       $PATH_SOURCE_KERNEL/kernel.$ARCH.o \
+      $PATH_SOURCE_KERNEL/drivers/base/io.$ARCH.o \
       $PATH_SOURCE_KERNEL/drivers/base/device_io.$ARCH.o \
       $PATH_SOURCE_KERNEL/drivers/video/vga/libvga.$ARCH.o
 
@@ -391,7 +346,7 @@ cc $opz \
 #'-----------------------------------------------------'
 echo "Create ISOTree $PATH_SOURCE_KERNEL/null0s.$ARCH.bin -> $PATH_BUILD/iso/boot/"
 mkdir -p $PATH_BUILD/iso/boot/grub
-cp $PATH_SOURCE_KERNEL/null0s.$ARCH.bin $PATH_BUILD/iso/boot/
+mv $PATH_SOURCE_KERNEL/null0s.$ARCH.bin $PATH_BUILD/iso/boot/
 
 echo "Create Grub Menu Label for null0s"
 cp $PATH_SOURCE/boot/grub.cfg $PATH_BUILD/iso/boot/grub/

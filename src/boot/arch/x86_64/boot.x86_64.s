@@ -1,19 +1,19 @@
-
 /*
- * ============================================================
- * boot.s
- *
- * x86-64 Microkernel Bootstrap
- * GRUB - Multiboot 1
- *
- * GNU Assembler (GAS)
- * Intel Syntax
- *
- * Initial CPU mode : Protected Mode (32 bit)
- * Final CPU mode   : Long Mode (64 bit)
- *
- * ============================================================
- */
+;
+;  boot.x64.s ( sintassi Intel / NASM )
+;
+;  Kernel Bootstrap 
+;  GRUB - Multiboot 1
+;
+;  Architettura : x64 
+;  Author       : jack0e
+;  Data         : 10/07/2026
+;  Licenza      : GNU GPLv3
+;
+;  Initial CPU mode : Protected Mode (32 bit)
+;  Final   CPU mode : Long Mode      (64 bit)
+;
+*/
 
 .intel_syntax noprefix
 

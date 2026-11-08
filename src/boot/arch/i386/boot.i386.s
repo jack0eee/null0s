@@ -1,9 +1,15 @@
 /*
 ;
-;  boot.s ( sintassi Intel / NASM )
+;  boot.i386.s ( sintassi Intel )
 ;
+;  Kernel Bootstrap
+;  GRUB - Multiboot 1
 ;
-; 
+;  Architettura : i386 
+;  Author       : jack0e
+;  Data         : 10/07/2026
+;  Licenza      : GNU GPLv3
+;
 */
 
 .intel_syntax noprefix

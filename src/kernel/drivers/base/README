@@ -1,3 +1,16 @@
 
+io.h
+
 Strato software al confine tra il SO e la CPU, lo strato piu' basso.
+
+
+io_devide.h
+
+Astrazione di io.h (PMIO/MMIO)
+
+
+
+
+
+
 

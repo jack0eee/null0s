@@ -1,0 +1,231 @@
+
+boot.i386.s
+-----------
+
+Il file boot.i386.s e' sostanzialmente il codice di bootstrap di null0s, e di qualsiasi
+altro kernel, o applicazione bare-metal che dovra' partire all'avvio di una macchina senza 
+alcun sistema operativo, ma tramite un boot-loader che implementa un protocollo chiamato 
+multiboot (versione 1). Senza questo sottile codice scritto normalmente in assembly, il
+boot-loader, ad esempio grub non sarebbe capace di passare il controllo al software applicativo.
+Il boot.i386.o dovra' essere linkato al kernel 
+
+
+  GRUB                  null0s.i386.bin                      shell
+.-------------.       .-----------------------------.      .--------------.
+| boot-loader |-----> | boot.i386.o + null0s.i386.o |----->| Applicazione |
+'-------------'       '-----------------------------'      '--------------' 
+
+Questo file non serve ad inizializzare completamente la CPU. Il bootloader (es. GRUB) ha gia'
+portato il processore in modalita' protetta a 32bit, con segmenti appropriati. Il tuo bootstrap
+si occupa principalmente di preparare l'ambiente minimo affinche' il codice C possa iniziare a funzionare. 
+E' un punto di partenza piuttosto classico per scrivere un piccolo kernel x86.
+
+Vediamo riga per riga, il boot.i386.s utilizzato per caricare null0s kernel.
+
+
+/*
+;
+;  boot.i386.s ( sintassi Intel )
+;
+;  Kernel Bootstrap
+;  GRUB - Multiboot 1
+;
+;  Architettura : i386 
+;  Author       : jack0e
+;  Data         : 10/07/2026
+;  Licenza      : GNU GPLv3
+;
+*/
+
+/*
+; E' possibile usare vari assembler per tradurre il sorgente assembly in
+; codice macchina, ad esempio : NASM, GAS e "clang internal assembler",
+; ed esistono 2 sintassi principali del linguaggio assembly : "intel" e "AT&T".
+; Nel caso specifico, verra' utilizzata quella "Intel", implementata sia da GAS (GNU Assembler)
+; e da "clang internal assembler", ma non da NASM.
+ 
+.intel_syntax noprefix
+
+
+/* 
+; Il seguente blocco definisce una serie di costanti, necessarie per valorizzare
+; una struttura dati, che il protocollo "Multiboot *versione 1*" richiede.
+;
+;             |
+; ALIGN   = 1 | Valorizzato ad 1, chiede di allineare i moduli caricati ad indirizzi multipli di 4kb. 
+; MEMINFO = 2 | Valorizzato a 2, richiede al bootloader di fornire informazioni sulla memoria. 
+; FLAGS       | Richiede i FLAGS richiesti dal kernel, nel caso specifico ALIGN e MEMINFO
+; MAGIC       | Numero identificativo del protocollo ("0x1BADB002" e' quello di "Multiboot versione 1") 
+; CHECKSUM    | Carattere di controllo per verificare che l'header sia valido (MAGIC+FLAGS+CHECKSUM==0)
+;             | Quindi il CHECKSUM=-(MAGIC+FLAGS)
+;             |
+*/
+
+.set ALIGN,    1<<0
+.set MEMINFO,  1<<1
+.set FLAGS,    ALIGN | MEMINFO
+.set MAGIC,    0x1BADB002
+.set CHECKSUM, -(MAGIC + FLAGS)
+
+/*
+;
+; Sezione Multiboot.
+;
+; Viene definita la struttura dati (multiboot) che rappresenta l'header previsto nel protocollo
+; Multiboot (versione 1). Questo blocco e' particolarmente importante.
+; L'header contiene 3 valori da 32bit (long) : magic number, flags e checksum
+; Questa struttura e' ricercata nell'immagine del kernel dal boot loader, e ".section .multiboot"
+; crea appunto la sezione dedicata nell'ELF. Il boot-loader se trova questa struttura  
+; nell'ELF capisce che tale file contiene un kernel avviabile secondo il protocollo multiboot.
+; Questa sezione non e' quindi codice, ma solo la definizione di una struttura dati, necessaria
+; per necessaria per avviare il kernel. Attenzione! la struttura .multiboot dovra' essere
+; collocata in una posizione che il boot-loader (es GRUB) possa trovarla, normalmente nei primi
+; 8k (8192 byte) del file   
+;
+; .section .multiboot  | Crea nell'ELF la struttura multiboot (versione 1) ricercata dal boot loader
+; .align 4             | Allinea i valori contenuti per multipli di 4
+; .long MAGIC          | Inserisce nella sezione il "magic number", riservando ad questo 4 byte (32bit)
+;                      | Come abbiamo visto il valore e' 0x1BADB002 (versione multiboot 1)
+; .long FLAGS          | Inserisce nei successivi 4 byte dell'header i flags ALIGN e MEMINFO
+; .long CHECKSUM       | Infine nei successivo 4byte il CHECKSUM per il test di validita' dell'header
+;                      | da parte del boot-loader.
+;
+*/
+  
+.section .multiboot   
+.align 4             
+.long MAGIC         
+.long FLAGS           
+.long CHECKSUM
+
+
+/*
+;
+; Sezione Text
+;
+; La sezione Text definisce e rende visibile al boot-loader il punto di ingresso del kernel.                 
+; 
+;                |
+; .global _start | rende _start visibile al linker e a tutti gli oggi linkati da esso. E'
+;                | definito successivamente, ed e' il punto di ingresso del kernel.
+; .extern kmain  | dichiara che kmain e' definita altrove, quindi in un altro file. Nel caso
+;                | specifico e' la main della funzione principale del kernel.
+; .code 32       | Dice all'assembler di generare codice in modalita' x86 e a 32 bit (i386) 
+;                |
+;
+*/
+
+.section .text
+.global _start
+.extern kmain
+
+.code32
+
+
+/*
+;
+; Punto di ingresso del kernel (funzione _start) 
+; 
+; l'etichetta _start gia' resa visibile precedentemente e' il punto di ingresso vero e 
+; proprio del kernel (null0s), quindi da questo punto in poi il controllo passa dal
+; boot loader al kernel stesso. Lo si puo' indicare anche nella fase di link con ENTRY(_start),
+; in questo modo il linker imposta "_start" come entry point dell'eseguibile ELF.
+;
+;                           |
+; cli                       | Clear Interrupt Flag. Disabilita gli interrupt mascherabili dalla CPU.
+;                           | Il motivo e' quello evitare che arrivino interrupt quando il kernel non 
+;                           | non ha ancora inizializzato il proprio sistema di gestione degli interrupt
+;                           | (IDT e relativi handler). Attenzione che CLI non disabilita tutti gli 
+;                           | interrupt, come ad esempio gli NMI (ossia gli interrupt non mascherabili  
+;                           | dalla CPU | NMI -> Not Maskable Interrupt).
+;                           |
+; mov esp, offset stack_top | esp = offset stack_top. Impostata il registro esp (ovvero lo "stack pointer",
+;                           | o "puntatore allo stack", all'indirizzo (offset) di stack_top. E' fondamentale
+;                           | perche' quando viene chiamata la funzione kmail, il compilatore si aspetta
+;                           | di avere uno stack valido. Lo stack viene utilizzato per memorizzare gli 
+;                           | di ritorno delle funzioni, passare gli argomenti alle funzioni, conservare le
+;                           | variabili locali, salvare i registri ed informazioni temporanee. Quindi 
+;                           | con questo comando si sta creando lo stack iniziale di null0s. 
+;                           | 
+; call kmail                | Chiama la funzione kmail del kernel presente nell'ELF. Qui avviene il passaggio,
+;                           | all'interno di null0s.i386.bin, da boot.i386.o (codice assembler) a
+;                           | null0s.i386.o (codice C). Multiboot (versione 1) passa 2 informazioni tramite 
+;                           | i registri EAX ed EBX. Il primo conterra' il magic number (ossia 0x2BADB002)
+;                           | ed il secondo l'indirizzo fisoco della struttura Multiboot Information.
+;                           | Queste informazioni sono utili ad esempio per leggere la memoria disponibile.
+;                           | Il boot.i386.s non modifica questi 2 registri prima della chiamata a kmail, quindi
+;                           | possono arrivare, senza problemi, al codice C (kernel), purche' il codice 
+;                           | generato dal compilatore non le sovrascriva prima che le cancelli. La specifica 
+;                           | multiboot (versione 1) prevede questi due registro proprio come interfaccia 
+;                           | tra il bootloader ed il kernel. TODO: Prima di chiamae kmail sarebbe opportuno
+;                           | salvare il contenuto di EAX e EBX, oppure passarli come parametri alla funzione
+;                           | kmail. In tal caso si potrebbe prototipare in questo modo kmail :
+;                           | >> kmail (unsigned int magic, unsigned int mbi_addr)
+;                           | e preparare gli argomenti sullo stack secondo la convenzione di chiamata C i386.
+;                           | Da fare attenzione al fatto che la specifica implementazione del compilatore
+;                           | potrebbe richiedere un particolare all'ineamento dello stack [?]. Per approfondire
+;                           | la specifica "Multiboot (versione 1)" di GNU GRUB, si rimanda all'indirizzo
+;                           | https://www.gnu.org/software/grub/manual/multiboot/multiboot.html.
+;                           |
+; halt:                     | halt e' solo l'etichetta a cui far riferimento per un loop infinito. 
+;                           | 
+; hlt                       | Quando il kernel (funzione kmain) termina, e ritorna quindi il controllo
+;                           | a boot.i386.o (codice assembly), viene eseguita la funzione hlt che mette 
+;                           | la CPU in uno stato di arresto, fino al verificarsi di un evento che la risvegli.
+;                           |
+; jmp halt                  | Salta all'etichetta halt, rieseguento nuovamente "hlt". In questo modo 
+;                           | la CPU rimane in perenne stato di arresto. Questo loop infinito serve per 
+;                           | eseguire cio' che potrebbe esserci successivamente (istruzioni casuali), 
+;                           | nella memoria.
+;                           |
+; 
+*/
+
+_start:
+
+     cli 
+
+     mov esp, offset stack_top
+
+     call kmain
+
+halt:
+
+     hlt
+     jmp halt
+
+
+/*
+; Sezione BSS | Lo stack del kernel.
+;
+; In questa sezione viene definito lo stack del kernel, a cui si faceva riferimento alla Sezione Text
+; Il segmento .bss rirpetta ai quello .data, permette di dichiarare variabili globali e statiche,
+; senza necessariamente doverle inizializzare. Pensera' il loader a riservare lo spazio e ad inizializzarle 
+; a zero. 
+;
+; .section .bss  | Definisce la sezione .bss
+; .align 16      | Allinea il successivo indirizzo a multiplo di 16 byte. Questo e' utile per rispettare
+;                | i requisiti di allineamento dello stack e delle strutture dati.
+;                |
+; stack_botton:  | E' semplicementa l'etichetta che delimita l'inizio dello spazio riservato allo stack.
+; .skip 16384    | Riserva 16384 byte, cioe' 16kb, senza inializzare il contenuto
+;
+; stack_top:     | Identifica la fine dello spazio riservato allo stack. E' stato chiamato 'top' perche'
+;                | sull'architettura x86 (i86, i386, ...) lo stack cresce dal valore piu' alto, verso gli 
+;                | indirizzi di memoria inferiori. Quando si esegue "mov esp, offset stack_top", stai 
+;                | posizionando lo "stack pointer" (esp) all'inizio dello stack (stack_top).
+;
+*/
+
+.section .bss
+.align 16
+
+stack_botton:
+.skip 16384
+
+stack_top:
+
+
+; ===--- EOF 
+
+

@@ -1,5 +1,8 @@
 #!/bin/sh
 
+#--- Architettura : i386
+ARCH=i386
+
 #--- environment 
 PATH_HOME=~/null0s
 PATH_SOURCE=$PATH_HOME/src
@@ -9,15 +12,16 @@ PATH_SOURCE_KERNEL=$PATH_SOURCE/kernel
 PATH_BUILD=$PATH_HOME/build
 #------------------------------
 
-echo "boot $PATH_BUILD/iso/boot/null0s.bin"
+echo "boot $PATH_BUILD/iso/boot/null0s.$ARCH.bin"
 
 #.--------.
 #| boot.s |
 #'--------'
 qemu-system-i386 \
-  -kernel $PATH_BUILD/iso/boot/null0s.bin \
+  -kernel $PATH_BUILD/iso/boot/null0s.$ARCH.bin \
   -boot order=c \
   -no-reboot \
   -serial none \
-  -net none \
+  -net none
 
+exit 0
