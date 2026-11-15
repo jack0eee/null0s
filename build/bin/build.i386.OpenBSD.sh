@@ -127,6 +127,21 @@ $CC $CFLAGS \
    -c $PATH_SOURCE_KERNEL/drivers/video/vga/libvga.c \
    -o $PATH_SOURCE_KERNEL/drivers/video/vga/libvga.$ARCH.o
 
+#.--------------------------.
+#| driver -> keyboard/ps2.o |
+#|                          '-------------------.
+#|                                              |
+#| Implementa il driver PS2, ossia una          |
+#| collezione di funzioni                       |
+#|                                              |
+#| Dipendenze : device_io.o                     |
+#|                                              |
+#'----------------------------------------------'
+echo "$CC $PATH_SOURCE_KERNEL/drivers/keyboard/ps2/ps2.c -> ps2.$ARCH.o"
+$CC $CFLAGS \
+   -I $PATH_SOURCE_KERNEL/drivers/base \
+   -c $PATH_SOURCE_KERNEL/drivers/keyboard/ps2/ps2.c \
+   -o $PATH_SOURCE_KERNEL/drivers/keyboard/ps2/ps2.$ARCH.o
 
 #.-------------------.
 #| libc/ansi/ctype.c |
@@ -192,7 +207,7 @@ $CC $CFLAGS \
 echo "$CC $PATH_SOURCE_LIBC/ansi/stdio.c -> stdio.$ARCH.o"
 $CC $CFLAGS \
    -I $PATH_SOURCE_KERNEL/drivers/video/vga \
-   -I $PATH_SOURCE_LIBC/include/ansi/ \
+   -I $PATH_SOURCE_LIBC/ansi/include \
    -c $PATH_SOURCE_LIBC/ansi/stdio.c \
    -o $PATH_SOURCE_LIBC/ansi/stdio.$ARCH.o
 
@@ -208,8 +223,8 @@ $CC $CFLAGS \
 #$CC $CFLAGS \
 #   -I $PATH_SOURCE_KERNEL/drivers/video/vga \
 #   -I $PATH_SOURCE_KERNEL/libk \
-#   -I $PATH_SOURCE_LIBC/include/ansi \
-#   -I $PATH_SOURCE_LIBC/include/posix \
+#   -I $PATH_SOURCE_LIBC/ansi/include \
+#   -I $PATH_SOURCE_LIBC/posix/include \
 #   -c $PATH_SOURCE_LIBC/libc.c \
 #   -o $PATH_SOURCE_LIBC/libc.$ARCH.o
 
@@ -229,7 +244,7 @@ $CC $CFLAGS \
 echo "$CC $PATH_SOURCE_APPL/gameOfLife/gameOfLife.c -> gameOfLife.$ARCH.o"
 $CC $CFLAGS \
    -I $PATH_SOURCE_KERNEL/drivers/video/vga \
-   -I $PATH_SOURCE_LIBC/include/ansi \
+   -I $PATH_SOURCE_LIBC/ansi/include \
    -c $PATH_SOURCE_APPL/gameOfLife/gameOfLife.c \
    -o $PATH_SOURCE_APPL/gameOfLife/gameOfLife.$ARCH.o
 
@@ -248,9 +263,66 @@ $CC $CFLAGS \
 echo "$CC $PATH_SOURCE_APPL/printIntSizeof/printIntSizeof.c -> printIntSizeof.$ARCH.o"
 $CC $CFLAGS \
    -I $PATH_SOURCE_KERNEL/drivers/video/vga \
-   -I $PATH_SOURCE_LIBC/include/ansi \
+   -I $PATH_SOURCE_LIBC/ansi/include \
    -c $PATH_SOURCE_APPL/printIntSizeof/printIntSizeof.c \
    -o $PATH_SOURCE_APPL/printIntSizeof/printIntSizeof.$ARCH.o
+
+#.--------------------------------.
+#| APPLFake/printInfoMultiboot-v1 |
+#|                                '-------------.
+#|                                              |
+#| Applicazione Fake per visualizzare il        |
+#| le infomazioni passate da un boot loader     |
+#| come ad esempio GNU GRUB al null0s kernel    |
+#| previste per l'interfaccia Multiboot-v1 :    |
+#| magic e la Multiboot Information             |
+#| Structure (mbi).                             |
+#|                                              |
+#| Dipendenze : libc/ansi                       |
+#|                                              |
+#'----------------------------------------------'
+echo "$CC $PATH_SOURCE_APPL/printInfoMultibootv1/printInfoMultibootv1.c -> printInfomultibootv1.$ARCH.o"
+$CC $CFLAGS \
+   -I $PATH_SOURCE_KERNEL/drivers/video/vga \
+   -I $PATH_SOURCE_KERNEL/include \
+   -I $PATH_SOURCE_LIBC/ansi/include \
+   -c $PATH_SOURCE_APPL/printInfoMultibootv1/printInfoMultibootv1.c \
+   -o $PATH_SOURCE_APPL/printInfoMultibootv1/printInfoMultibootv1.$ARCH.o
+
+#.------------------------.
+#| APPLFake/vgaDriverTest |
+#|                        '---------------------.
+#|                                              |
+#| Applicazione Fake per effettuare il test     |
+#| delle funzioni del driver VGA.               |
+#|                                              |
+#| Dipendenze : libc/ansi                       |
+#|                                              |
+#'----------------------------------------------'
+echo "$CC $PATH_SOURCE_APPL/vgaDriverTest/vgaDriverTest.c -> vgaDriverTest.$ARCH.o"
+$CC $CFLAGS \
+   -I $PATH_SOURCE_KERNEL/drivers/video/vga \
+   -I $PATH_SOURCE_LIBC/ansi/include \
+   -c $PATH_SOURCE_APPL/vgaDriverTest/vgaDriverTest.c \
+   -o $PATH_SOURCE_APPL/vgaDriverTest/vgaDriverTest.$ARCH.o
+
+#.------------------------.
+#| APPLFake/ps2DriverTest |
+#|                        '---------------------.
+#|                                              |
+#| Applicazione Fake per effettuare il test     |
+#| delle funzioni del driver PS2.               |
+#|                                              |
+#| Dipendenze : libc/ansi                       |
+#|                                              |
+#'----------------------------------------------'
+echo "$CC $PATH_SOURCE_APPL/ps2DriverTest/ps2DriverTest.c -> ps2DriverTest.$ARCH.o"
+$CC $CFLAGS \
+   -I $PATH_SOURCE_KERNEL/drivers/video/vga \
+   -I $PATH_SOURCE_KERNEL/drivers/keyboard/ps2 \
+   -I $PATH_SOURCE_LIBC/ansi/include \
+   -c $PATH_SOURCE_APPL/ps2DriverTest/ps2DriverTest.c \
+   -o $PATH_SOURCE_APPL/ps2DriverTest/ps2DriverTest.$ARCH.o
 
 #.---------------.
 #| kernel/libk.c |
@@ -282,9 +354,13 @@ echo "$CC $PATH_SOURCE_KERNEL/kernel.c -> kernel.$ARCH.o"
 $CC $CFLAGS \
    -I $PATH_SOURCE_APPL/gameOfLife \
    -I $PATH_SOURCE_APPL/printIntSizeof \
-   -I $PATH_SOURCE_LIBC/include/ansi \
-   -I $PATH_SOURCE_LIBC/include/posix \
+   -I $PATH_SOURCE_APPL/printInfoMultibootv1 \
+   -I $PATH_SOURCE_APPL/vgaDriverTest \
+   -I $PATH_SOURCE_APPL/ps2DriverTest \
+   -I $PATH_SOURCE_LIBC/ansi/include \
+   -I $PATH_SOURCE_LIBC/posix/include \
    -I $PATH_SOURCE_KERNEL/drivers/video/vga \
+   -I $PATH_SOURCE_KERNEL/include \
    -c $PATH_SOURCE_KERNEL/kernel.c \
    -o $PATH_SOURCE_KERNEL/kernel.$ARCH.o 
 
@@ -299,26 +375,13 @@ echo "link $PATH_SOURCE/null0s.$ARCH.bin <- "\
      "libc/libc.$ARCH.o,"\
      "appl/gameOfLife/gameOfLife.$ARCH.o,"\
      "appl/printIntSizeof/printIntSizeof.$ARCH.o,"\
+     "appl/printInfoMultibootv1/printInfoMultibootv1.$ARCH.o,"\
+     "appl/vgaDriverTest/vgaDriverTest.$ARCH.o,"\
      "kernel/kernel.$ARCH.o,"\
      "kernel/drivers/base/io.$ARCH.o,"\
      "kernel/drivers/base/device_io.$ARCH.o,"\
-     "kernel/drivers/video/vga/libvga.$ARCH.o"
-
-#$CC $opz \
-#   -fPIC \
-#   -nostdlib \
-#   -Wl,-T,$PATH_SOURCE_KERNEL/linker.$ARCH.ld \
-#   -Wl,-z,notext \
-#   -o $PATH_SOURCE_KERNEL/null0s.$ARCH.bin \
-#      $PATH_SOURCE_BOOT/boot.$ARCH.o \
-#      $PATH_SOURCE_LIBC/libc.$ARCH.o \
-#      $PATH_SOURCE_APPL/gameOfLife/gameOfLife.$ARCH.o \
-#      $PATH_SOURCE_APPL/printIntSizeof/printIntSizeof.$ARCH.o \
-#      $PATH_SOURCE_KERNEL/libk/libk.$ARCH.o \
-#      $PATH_SOURCE_KERNEL/kernel.$ARCH.o \
-#      $PATH_SOURCE_KERNEL/drivers/base/io.$ARCH.o 
-#      $PATH_SOURCE_KERNEL/drivers/base/device_io.$ARCH.o \
-#      $PATH_SOURCE_KERNEL/drivers/video/vga/libvga.$ARCH.o 
+     "kernel/drivers/video/vga/libvga.$ARCH.o"\
+     "kernel/drivers/keyboard/ps2/ps2.$ARCH.o"
 
 $CC $opz \
    -no-pie \
@@ -333,10 +396,14 @@ $CC $opz \
       $PATH_SOURCE_LIBC/ansi/stdio.$ARCH.o \
       $PATH_SOURCE_APPL/gameOfLife/gameOfLife.$ARCH.o \
       $PATH_SOURCE_APPL/printIntSizeof/printIntSizeof.$ARCH.o \
+      $PATH_SOURCE_APPL/printInfoMultibootv1/printInfoMultibootv1.$ARCH.o \
+      $PATH_SOURCE_APPL/vgaDriverTest/vgaDriverTest.$ARCH.o \
+      $PATH_SOURCE_APPL/ps2DriverTest/ps2DriverTest.$ARCH.o \
       $PATH_SOURCE_KERNEL/kernel.$ARCH.o \
       $PATH_SOURCE_KERNEL/drivers/base/io.$ARCH.o \
       $PATH_SOURCE_KERNEL/drivers/base/device_io.$ARCH.o \
-      $PATH_SOURCE_KERNEL/drivers/video/vga/libvga.$ARCH.o
+      $PATH_SOURCE_KERNEL/drivers/video/vga/libvga.$ARCH.o \
+      $PATH_SOURCE_KERNEL/drivers/keyboard/ps2/ps2.$ARCH.o
 
 #.-----------------.
 #| Create ISO Tree | 

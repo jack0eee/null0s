@@ -8,7 +8,7 @@
 '-----------------------------------------------------' */
 
 #include "stdio.h"
-
+#include "stdint.h"
 
 /*
 .-----------------.
@@ -16,9 +16,14 @@
 '-----------------' */
 #include "gameOfLife.h"
 #include "printIntSizeof.h"
+#include "printInfoMultibootv1.h"
+#include "vgaDriverTest.h"
+#include "ps2DriverTest.h"
+
+// #include "multiboot.h"
 
 
-void kmain(void)
+void kmain(uint32_t magic, uint32_t mbi_addr)
 {
      char *banner = "null0s 0.1 starting...\n" ;
 
@@ -34,117 +39,32 @@ void kmain(void)
      |              Banner null0s               |
      '------------------------------------------' */
      vga_console_setposition (0,0);
-
      vga_console_setcolor ( VGA_COLOR_BLUE, VGA_COLOR_WHITE);
-     puts(banner);
-     vga_console_setcolor ( VGA_COLOR_BLACK, VGA_COLOR_YELLOW );
+     printf("%s", banner);
 
      vga_cursor_enable (0, 15);
-     vga_cursor_setposition (20,1);
-
-
-//------------------
-
-     vga_console_setcolor ( VGA_COLOR_WHITE, VGA_COLOR_BLACK);
-     puts ("\n\n[VGA test]\n");
-     vga_console_setcolor ( VGA_COLOR_BLACK, VGA_COLOR_YELLOW);
- 
-     
-//     .---------------------------------------.
-//     | TEST Scroling e dimensionamento video |
-//     '---------------------------------------' 
-
-     puts("[riga-01]+123456789+123456789+123456789+123456789+123456789+123456789+123456789+");
-     puts("[riga-02]+123456789+123456789+123456789+123456789+123456789+123456789+123456789+");
-     puts("[riga-03]+123456789+123456789+123456789+123456789+123456789+123456789+123456789+");
-     puts("[riga-04]+123456789+123456789+123456789+123456789+123456789+123456789+123456789+");
-     puts("[riga-05]+123456789+123456789+123456789+123456789+123456789+123456789+123456789+");
-     puts("[riga-06]+123456789+123456789+123456789+123456789+123456789+123456789+123456789+");
-
-     vga_console_setcolor ( VGA_COLOR_CYAN, VGA_COLOR_YELLOW );
-     puts("[riga-07]+123456789+123456789+123456789+123456789+123456789+123456789+123456789+");
-     vga_console_setcolor ( VGA_COLOR_BLACK, VGA_COLOR_YELLOW );
-
-     puts("[riga-08]+123456789+123456789+123456789+123456789+123456789+123456789+123456789+");
-     puts("[riga-09]+123456789+123456789+123456789+123456789+123456789+123456789+123456789+");
-     puts("[riga-10]+123456789+123456789+123456789+123456789+123456789+123456789+123456789+");
-
-/*
-     puts("[riga-11]+123456789+123456789+123456789+123456789+123456789+123456789+123456789+");
-     puts("[riga-12]+123456789+123456789+123456789+123456789+123456789+123456789+123456789+");
-     puts("[riga-13]+123456789+123456789+123456789+123456789+123456789+123456789+123456789+");
-     puts("[riga-14]+123456789+123456789+123456789+123456789+123456789+123456789+123456789+");
-     puts("[riga-15]+123456789+123456789+123456789+123456789+123456789+123456789+123456789+");
-     puts("[riga-16]+123456789+123456789+123456789+123456789+123456789+123456789+123456789+");
-     puts("[riga-17]+123456789+123456789+123456789+123456789+123456789+123456789+123456789+");
-     puts("[riga-18]+123456789+123456789+123456789+123456789+123456789+123456789+123456789+");
-     puts("[riga-19]+123456789+123456789+123456789+123456789+123456789+123456789+123456789+");
-     puts("[riga-20]+123456789+123456789+123456789+123456789+123456789+123456789+123456789+");
-
-     puts("[riga-21]+123456789+123456789+123456789+123456789+123456789+123456789+123456789+");
-     puts("[riga-22]+123456789+123456789+123456789+123456789+123456789+123456789+123456789+");
-     puts("[riga-23]+123456789+123456789+123456789+123456789+123456789+123456789+123456789+");
-     puts("[riga-24]+123456789+123456789+123456789+123456789+123456789+123456789+123456789+");
-     puts("[riga-25]+123456789+123456789+123456789+123456789+123456789+123456789+123456789+");
-     puts("[riga-26]+123456789+123456789+123456789+123456789+123456789+123456789+123456789+");
-     puts("[riga-27]+123456789+123456789+123456789+123456789+123456789+123456789+123456789+");
-     puts("[riga-28]+123456789+123456789+123456789+123456789+123456789+123456789+123456789+");
-     puts("[riga-29]+123456789+123456789+123456789+123456789+123456789+123456789+123456789+");
-     puts("[riga-30]+123456789+123456789+123456789+123456789+123456789+123456789+123456789+");
-*/
-
-     vga_console_setcolor ( VGA_COLOR_RED, VGA_COLOR_YELLOW );
-     puts("< ULTIMA | ");
-     vga_console_setcolor ( VGA_COLOR_BLACK, VGA_COLOR_YELLOW );
-
-     puts("ULTIMISSIMA | ");
-
-     vga_console_setcolor ( VGA_COLOR_GREEN, VGA_COLOR_YELLOW );
-     puts("STRAAAAAAAAAAAAAAAAAAAAAAAAAAULTIMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-     vga_console_setcolor ( VGA_COLOR_BLACK, VGA_COLOR_YELLOW );
-
-     vga_console_setposition (50,23);
-     vga_console_setcolor ( VGA_COLOR_MAGENDA, VGA_COLOR_YELLOW );
-     puts("<END>");
-
-/*
-     vga_console_setcolor ( VGA_COLOR_BLACK, VGA_COLOR_YELLOW );
-
-     vga_font_setcolor ( VGA_COLOR_CYAN, VGA_COLOR_WHITE, 50, 23);
-*/
-
-/*
-     vga_console_setposition (0,0);
-     vga_console_setcolor ( VGA_COLOR_BLUE, VGA_COLOR_WHITE);
-     puts(banner); 
-*/
-     //--------
-     vga_cursor_enable (0, 15);
-     vga_cursor_setposition (0,1);
 
      /*
-     .-------------------------.
-     | fake APPL : gameOfLife  |
-     '-------------------------' */
-     /*
-     vga_console_setcolor ( VGA_COLOR_BLUE, VGA_COLOR_WHITE);
-     puts("Starting APPL:TheGameOfLife...");
+     .---------------------------------------------------------.
+     |               Debugging Application Fake                |
+     +---------------------------------------------------------+
+     |  1) printInfoMultibootv1                                |
+     |  2) vgaDriverTest                                       |
+     |  3) gameOfLife                                          |
+     |  4) printIntSizeof                                      | 
+     |  5) ps2DriverTest                                       |
+     '---------------------------------------------------------' */
+     uint8_t idApplication = 5;
+     switch (idApplication) 
+     {
+        case 1  : printInfoMultibootv1 (magic, mbi_addr); break;
+        case 2  : vgaDriverTest();                        break;
+        case 3  : gameOfLife();                           break;
+        case 4  : printIntSizeof();                       break;
+        case 5  : ps2DriverTest();                        break;
+        default : printf("no application.");
+     }
 
-     vga_console_setcolor ( VGA_COLOR_BLACK, VGA_COLOR_YELLOW );
-     gameOfLife();
-     */ 
-
-     /*
-     .--------------------------------------------.
-     | fake APPL : printIntSizeof | stdint.h test |
-     '--------------------------------------------' */
-     /*
-     vga_console_setcolor ( VGA_COLOR_BLUE, VGA_COLOR_WHITE);
-     puts("Starting APPL:printIntSizeof...");
-
-     vga_console_setcolor ( VGA_COLOR_BLACK, VGA_COLOR_YELLOW );
-     printIntSizeof();
-     */
 
 
      for (;;)

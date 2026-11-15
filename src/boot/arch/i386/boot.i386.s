@@ -38,6 +38,9 @@ _start:
 
      mov esp, offset stack_top
 
+     push ebx
+     push eax
+
      call kmain
 
 halt:

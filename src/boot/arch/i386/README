@@ -147,6 +147,9 @@ Vediamo riga per riga, il boot.i386.s utilizzato per caricare null0s kernel.
 ;                           | variabili locali, salvare i registri ed informazioni temporanee. Quindi 
 ;                           | con questo comando si sta creando lo stack iniziale di null0s. 
 ;                           | 
+; push ebx                  | ...
+; push eax                  | ...
+;                           |
 ; call kmail                | Chiama la funzione kmail del kernel presente nell'ELF. Qui avviene il passaggio,
 ;                           | all'interno di null0s.i386.bin, da boot.i386.o (codice assembler) a
 ;                           | null0s.i386.o (codice C). Multiboot (versione 1) passa 2 informazioni tramite 
@@ -186,6 +189,9 @@ _start:
      cli 
 
      mov esp, offset stack_top
+
+     push ebx
+     push eax
 
      call kmain
 
